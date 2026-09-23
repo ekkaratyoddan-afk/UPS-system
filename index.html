@@ -98,24 +98,17 @@
 
 <!-- ================= TAB 1: OVERVIEW ================= -->
 <div id="t1" class="tab-content active">
-  <div class="cards-grid">
-    <div class="card"><div class="label">Total UPS Units</div><div class="value">11 <span class="unit">ยูนิต</span></div></div>
-    <div class="card"><div class="label">CRAH Total Units</div><div class="value">62 <span class="unit">เครื่อง</span></div></div>
-    <div class="card"><div class="label">Total IT Load (Sim)</div><div class="value">321.4 <span class="unit">kW</span></div></div>
-    <div class="card"><div class="label">สถานะแจ้งเตือนวิกฤต</div><div class="value" style="color:var(--ok)">0 <span class="unit">ระบบ</span></div></div>
-  </div>
+  <div class="cards-grid" id="cards-summary"></div>
 
-  <div class="section-title">⚡ สรุปจำนวนและประเภท UPS แยกตามอาคาร (รวม 11 ยูนิต)</div>
+  <div class="section-title">⚡ รายละเอียดโหลดและการใช้งานจริงแยกตามรายเครื่อง (UPS 400kVA หลัก 8 ยูนิต)
+    <button class="btn btn-sm" onclick="openAddModal('load')">+ เพิ่ม UPS Load</button>
+  </div>
   <div class="table-box">
     <table>
       <thead>
-        <tr><th>อาคาร / โซน</th><th>UPS 400 kVA</th><th>UPS 30 kVA</th><th>UPS 60 kVA</th><th>รวมแต่ละอาคาร</th></tr>
+        <tr><th>ชื่ออุปกรณ์</th><th>ขนาดพิกัด (Capacity)</th><th>โหลดปัจจุบัน (kW)</th><th>เปอร์เซ็นต์การใช้งาน (% Load)</th><th>สถานะ</th><th>จัดการ</th></tr>
       </thead>
-      <tbody>
-        <tr><td><b>Phase 1 (อาคาร UT Building)</b></td><td>8 ตัว (UPS-1A..1D, 2A..2D)</td><td>2 ตัว</td><td>-</td><td><b>10 เครื่อง</b></td></tr>
-        <tr><td><b>อาคาร Office</b></td><td>-</td><td>-</td><td>1 ตัว</td><td><b>1 เครื่อง</b></td></tr>
-        <tr><td><b>รวมทั้งหมด</b></td><td><b>8 ตัว</b></td><td><b>2 ตัว</b></td><td><b>1 ตัว</b></td><td><b style="color:var(--primary)">11 เครื่อง</b></td></tr>
-      </tbody>
+      <tbody id="tbl-load"></tbody>
     </table>
   </div>
 
@@ -147,7 +140,7 @@
 
   <div class="grid-2">
     <div class="chart-container">
-      <h3 style="font-size:14px;color:#2d3748">📈 แนวโน้มโหลด UPS หลัก (kW)</h3>
+      <h3 style="font-size:14px;color:#2d3748">📈 เปรียบเทียบโหลดปัจจุบันรายเครื่อง UPS (kW)</h3>
       <div class="chart-box"><canvas id="loadChart"></canvas></div>
     </div>
     <div class="chart-container">
@@ -320,10 +313,22 @@
   </div>
 </div>
 
-<footer>IDC3 Master Infrastructure Dashboard & Editor — อัปเดตระบบจัดการ Vendor เรียบร้อย</footer>
+<footer>IDC3 Master Infrastructure Dashboard & Editor — อัปเดตระบบแก้ไขโหลด UPS สำเร็จ</footer>
 
 <script>
+  let loadChartInstance = null;
+
   const defaultData = {
+    load: [
+      {name:"UPS1A", cap:"400 kVA / 400 kW", kw:101, status:"● ปกติ"},
+      {name:"UPS1B", cap:"400 kVA / 400 kW", kw:76, status:"● ปกติ"},
+      {name:"UPS1C", cap:"400 kVA / 400 kW", kw:106, status:"● ปกติ"},
+      {name:"UPS1D", cap:"400 kVA / 400 kW", kw:100, status:"● ปกติ"},
+      {name:"UPS2A", cap:"400 kVA / 400 kW", kw:85, status:"● ปกติ"},
+      {name:"UPS2B", cap:"400 kVA / 400 kW", kw:98, status:"● ปกติ"},
+      {name:"UPS2C", cap:"400 kVA / 400 kW", kw:88, status:"● ปกติ"},
+      {name:"UPS2D", cap:"400 kVA / 400 kW", kw:93, status:"● ปกติ"}
+    ],
     ups: [
       {loc:"Saraburi Phase 1 (อาคาร UT)", name:"UPS1A", brand:"SOCOMEC", model:"DELPHYS-GP 2.0", sn:"*************1", pm:"4 ครั้ง"},
       {loc:"Saraburi Phase 1 (อาคาร UT)", name:"UPS1B", brand:"SOCOMEC", model:"DELPHYS-GP 2.0", sn:"*************1", pm:"4 ครั้ง"},
@@ -391,7 +396,7 @@
     ],
     po26: [
       {num:"1", date:"25/02/2569", po:"P007-INET260200011", item:"Battery Replacement Butterfly Bldg 2 - Fiamm 12FIT201 (12V 195Ah) Warranty 5 yrs", ship:"180-210 วัน", prog:"Wait Update", install:"Wait Update", note:"สินค้าสั่งผลิตพิเศษ (By order)"},
-      {num:"2", date:"26/02/2568", po:"P007-INET260200016", item:"Battery Replacement 336 EA - Fiamm Model 12FLB400P (12V 105AH) for 8x 400kVA UPS Day1-Day2", ship:"180-210 วัน", prog:"Update 21/04/2569", install:"Wait Update", note:"สินค้าอยู่ระหว่างขนส่งทางเรือ มาถึงไทยประมาณมิถุนายน 2569 ติดตั้ง ต.ค. 2569"}
+      {num:"2", date:"26/02/268", po:"P007-INET260200016", item:"Battery Replacement 336 EA - Fiamm Model 12FLB400P (12V 105AH) for 8x 400kVA UPS Day1-Day2", ship:"180-210 วัน", prog:"Update 21/04/2569", install:"Wait Update", note:"สินค้าอยู่ระหว่างขนส่งทางเรือ มาถึงไทยประมาณมิถุนายน 2569 ติดตั้ง ต.ค. 2569"}
     ],
     air: [
       {phase:"แอร์เฟส 1", brand:"Emerson Network Power", model:"P2070DC1N2HL12L1A07ACE000 (P/N: F0119200 / INET)", sn:"21F0119200217B010002", tech:"ควบคุมอุณหภูมิและความชื้นแม่นยำสูง", date:"13/11/2017"},
@@ -404,23 +409,56 @@
     ]
   };
 
-  let db = JSON.parse(localStorage.getItem('idc3_master_db_v7')) || defaultData;
+  let db = JSON.parse(localStorage.getItem('idc3_master_db_v9')) || defaultData;
   let currentEditTable = '', currentEditIndex = -1;
 
   function saveData() {
-    localStorage.setItem('idc3_master_db_v7', JSON.stringify(db));
+    localStorage.setItem('idc3_master_db_v9', JSON.stringify(db));
     renderAll();
   }
 
   function resetData() {
     if(confirm('ต้องการรีเซ็ตข้อมูลทั้งหมดกลับเป็นค่าเริ่มต้นใช่หรือไม่?')) {
-      localStorage.removeItem('idc3_master_db_v7');
+      localStorage.removeItem('idc3_master_db_v9');
       db = JSON.parse(JSON.stringify(defaultData));
       renderAll();
     }
   }
 
   function renderAll() {
+    let totalKw = 0;
+    db.load.forEach(item => { totalKw += Number(item.kw) || 0; });
+    let avgPercent = (totalKw / (db.load.length * 400)) * 100;
+
+    document.getElementById('cards-summary').innerHTML = `
+      <div class="card"><div class="label">Total UPS Units</div><div class="value">11 <span class="unit">ยูนิต</span></div></div>
+      <div class="card"><div class="label">CRAH Total Units</div><div class="value">62 <span class="unit">เครื่อง</span></div></div>
+      <div class="card"><div class="label">Total IT Load (Calculated)</div><div class="value">${totalKw.toFixed(1)} <span class="unit">kW</span></div></div>
+      <div class="card"><div class="label">สถานะแจ้งเตือนวิกฤต</div><div class="value" style="color:var(--ok)">0 <span class="unit">ระบบ</span></div></div>
+    `;
+
+    document.getElementById('tbl-load').innerHTML = db.load.map((item, i) => {
+      let percent = ((item.kw / 400) * 100).toFixed(2);
+      return `
+        <tr>
+          <td><b>${item.name}</b></td>
+          <td>${item.cap}</td>
+          <td><b style="color:var(--primary)">${item.kw} kW</b></td>
+          <td><b>${percent}%</b></td>
+          <td><span style="color:var(--ok)">${item.status}</span></td>
+          <td><button class="btn btn-sm" onclick="openEditModal('load', ${i})">แก้ไข</button> <button class="btn btn-sm btn-danger" onclick="deleteRow('load', ${i})">ลบ</button></td>
+        </tr>
+      `;
+    }).join('') + `
+      <tr style="background:#f7fafc">
+        <td><b>รวมทั้งหมด (${db.load.length} เครื่อง)</b></td>
+        <td><b>${db.load.length * 400} kW</b></td>
+        <td><b style="color:var(--crit); font-size:14px">${totalKw} kW</b></td>
+        <td><b style="color:var(--primary)">${avgPercent.toFixed(2)}% (เฉลี่ย)</b></td>
+        <td colspan="2"><i>ระบบทำงานปกติ</i></td>
+      </tr>
+    `;
+
     document.getElementById('tbl-ups').innerHTML = db.ups.map((u, i) => `
       <tr>
         <td>${u.loc}</td>
@@ -472,6 +510,25 @@
       <tr><td><b>${a.phase}</b></td><td>${a.brand}</td><td>${a.model}</td><td>${a.sn}</td><td>${a.tech}</td><td>${a.date}</td>
       <td><button class="btn btn-sm" onclick="openEditModal('air', ${i})">แก้ไข</button> <button class="btn btn-sm btn-danger" onclick="deleteRow('air', ${i})">ลบ</button></td></tr>
     `).join('');
+
+    updateLoadChart();
+  }
+
+  function updateLoadChart() {
+    const ctxLoad = document.getElementById('loadChart').getContext('2d');
+    if(loadChartInstance) loadChartInstance.destroy();
+    
+    let labels = db.load.map(x => x.name);
+    let dataVals = db.load.map(x => x.kw);
+
+    loadChartInstance = new Chart(ctxLoad, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{ label: 'โหลดปัจจุบัน (kW)', data: dataVals, backgroundColor: '#3182ce' }]
+      },
+      options: { responsive: true, maintainAspectRatio: false }
+    });
   }
 
   function showUpsDetail(upsName) {
@@ -578,7 +635,9 @@
     const item = {};
     const sample = db[currentEditTable][0] || {};
     for (let key in sample) {
-      item[key] = document.getElementById(`m-${key}`).value;
+      let val = document.getElementById(`m-${key}`).value;
+      if(key === 'kw') val = Number(val) || 0;
+      item[key] = val;
     }
 
     if (currentEditIndex === -1) {
@@ -608,16 +667,6 @@
   }
 
   renderAll();
-
-  const ctxLoad = document.getElementById('loadChart').getContext('2d');
-  new Chart(ctxLoad, {
-    type: 'line',
-    data: {
-      labels: ['10:00', '10:30', '11:00', '11:30', '12:00', '12:30'],
-      datasets: [{ label: 'โหลดรวม UPS (kW)', data: [310, 315, 320, 318, 322, 321], borderColor: '#3182ce', backgroundColor: 'rgba(49, 130, 206, 0.1)', fill: true, tension: 0.3 }]
-    },
-    options: { responsive: true, maintainAspectRatio: false }
-  });
 
   const ctxTemp = document.getElementById('tempChart').getContext('2d');
   new Chart(ctxTemp, {
