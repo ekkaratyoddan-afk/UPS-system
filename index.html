@@ -75,7 +75,7 @@
 <header>
   <div>
     <h1>⚡ IDC3 Master Infrastructure Dashboard &amp; Editor</h1>
-    <div class="sub">ระบบฐานข้อมูลสารสนเทศและบริหารจัดการวิศวกรรม (คลิกที่ชื่อระบบใน Spare Parts เพื่อดูรายละเอียดชิ้นส่วนได้ทันที)</div>
+    <div class="sub">ระบบฐานข้อมูลสารสนเทศและบริหารจัดการวิศวกรรม (UPS และระบบปรับอากาศ)</div>
   </div>
   <div class="header-actions">
     <button class="btn btn-secondary btn-sm" onclick="resetData()">🔄 รีเซ็ตข้อมูลเริ่มต้น</button>
@@ -93,6 +93,7 @@
   <button class="tab-btn" onclick="switchTab(event, 't6')">📞 6. Vendor &amp; PM</button>
   <button class="tab-btn" onclick="switchTab(event, 't7')">📦 7. PO แบต 2025</button>
   <button class="tab-btn" onclick="switchTab(event, 't8')">📦 8. PO แบต 2026</button>
+  <button class="tab-btn" onclick="switchTab(event, 't9')">❄️ 9. สเปกแอร์</button>
 </div>
 
 <!-- ================= TAB 1: OVERVIEW ================= -->
@@ -245,9 +246,9 @@
         <tr><th>รายการระบบ / งาน</th><th>สถานที่ (Site)</th><th>Vendor ผู้ดูแล</th><th>ผู้ติดต่อหลัก</th><th>เบอร์โทรศัพท์</th><th>อีเมล / หมายเหตุ</th></tr>
       </thead>
       <tbody>
-        <tr><td><b>CRAH &amp; Water Leak</b></td><td>SRB Phase 1-2 (62 Unit)</td><td>Vertiv</td><td>Call Center / ชาตรี / วรชัย</td><td>081-928-2157, 081-928-2156</td><td>callcenter.th@vertivco.com</td></tr>
-        <tr><td><b>UPS 400kVA &amp; 30kVA</b></td><td>SRB Phase 1</td><td>Socomec</td><td>Hotline / กนก บัวกอ / อัครวินท์</td><td>086-043-1155, 065-716-1497</td><td>kanok.buako@socomec.com</td></tr>
-        <tr><td><b>UPS 60kVA (Office)</b></td><td>SRB Office Shaft</td><td>MAXI / ดีอาร์เค</td><td>ทนงศักดิ์ / อัศนีย์ / ณัฐพงศ์</td><td>094-560-7802, 098-791-2885</td><td>ausanee.s@maxipowerplus.co.th</td></tr>
+        <tr><td><b>CRAH &amp; Water Leak</b></td><td>SRB Phase 1-2 (62 Unit)</td><td>Vertiv</td><td>Call Center / ชาตรี / วรชัย</td><td>***-***-****, ***-***-****</td><td>**********.**@********.***</td></tr>
+        <tr><td><b>UPS 400kVA &amp; 30kVA</b></td><td>SRB Phase 1</td><td>Socomec</td><td>Hotline / กนก บัวกอ / อัครวินท์</td><td>***-***-****, ***-***-****</td><td>*****.*****@*******.***</td></tr>
+        <tr><td><b>UPS 60kVA (Office)</b></td><td>SRB Office Shaft</td><td>MAXI / ดีอาร์เค</td><td>ทนงศักดิ์ / อัศนีย์ / ณัฐพงศ์</td><td>***-***-****, ***-***-****</td><td>*******.*@*************.**.**</td></tr>
       </tbody>
     </table>
   </div>
@@ -283,6 +284,21 @@
   </div>
 </div>
 
+<!-- ================= TAB 9: AIR CONDITIONER SPECS ================= -->
+<div id="t9" class="tab-content">
+  <div class="section-title">❄️ รายละเอียดสเปกเครื่องปรับอากาศภายในห้อง Data Center (IDC3)
+    <button class="btn btn-sm" onclick="openAddModal('air')">+ เพิ่มข้อมูลแอร์</button>
+  </div>
+  <div class="table-box">
+    <table>
+      <thead>
+        <tr><th>เฟส / พื้นที่</th><th>แบรนด์ (Brand)</th><th>รุ่น (Model)</th><th>Serial Number (S/N)</th><th>ข้อมูลทางเทคนิคหลัก</th><th>วันที่ผลิต / ติดตั้ง</th><th>จัดการ</th></tr>
+      </thead>
+      <tbody id="tbl-air"></tbody>
+    </table>
+  </div>
+</div>
+
 <!-- Modal สำหรับแก้ไขข้อมูล -->
 <div id="editModal" class="modal">
   <div class="modal-content">
@@ -306,21 +322,21 @@
   </div>
 </div>
 
-<footer>IDC3 Master Infrastructure Dashboard & Editor — เพิ่มระบบคลิกดูรายละเอียดอะไหล่จากหน้า Spare Parts เรียบร้อย</footer>
+<footer>IDC3 Master Infrastructure Dashboard & Editor — เพิ่มระบบจัดการสเปกแอร์เรียบร้อย</footer>
 
 <script>
   const defaultData = {
     ups: [
-      {loc:"Saraburi Phase 1 (อาคาร UT)", name:"UPS1A", brand:"SOCOMEC", model:"DELPHYS-GP 2.0", sn:"16100385770001", pm:"4 ครั้ง"},
-      {loc:"Saraburi Phase 1 (อาคาร UT)", name:"UPS1B", brand:"SOCOMEC", model:"DELPHYS-GP 2.0", sn:"16100385981001", pm:"4 ครั้ง"},
-      {loc:"Saraburi Phase 1 (อาคาร UT)", name:"UPS1C", brand:"SOCOMEC", model:"DELPHYS-GP 2.0", sn:"16100385949001", pm:"4 ครั้ง"},
-      {loc:"Saraburi Phase 1 (อาคาร UT)", name:"UPS1D", brand:"SOCOMEC", model:"DELPHYS-GP 2.0", sn:"15100384100001", pm:"4 ครั้ง"},
+      {loc:"Saraburi Phase 1 (อาคาร UT)", name:"UPS1A", brand:"SOCOMEC", model:"DELPHYS-GP 2.0", sn:"*************1", pm:"4 ครั้ง"},
+      {loc:"Saraburi Phase 1 (อาคาร UT)", name:"UPS1B", brand:"SOCOMEC", model:"DELPHYS-GP 2.0", sn:"*************1", pm:"4 ครั้ง"},
+      {loc:"Saraburi Phase 1 (อาคาร UT)", name:"UPS1C", brand:"SOCOMEC", model:"DELPHYS-GP 2.0", sn:"*************1", pm:"4 ครั้ง"},
+      {loc:"Saraburi Phase 1 (อาคาร UT)", name:"UPS1D", brand:"SOCOMEC", model:"DELPHYS-GP 2.0", sn:"*************1", pm:"4 ครั้ง"},
       {loc:"Saraburi Phase 1 (อาคาร UT)", name:"UPS 30kVA-1", brand:"SOCOMEC", model:"MASTERYS-GP 2.0", sn:"P240382001", pm:"4 ครั้ง"},
       {loc:"Saraburi Phase 1 (อาคาร UT)", name:"UPS 30kVA-2", brand:"SOCOMEC", model:"MASTERYS-GP 2.0", sn:"P238703001", pm:"4 ครั้ง"},
-      {loc:"Saraburi Phase 1 (อาคาร UT)", name:"UPS2A", brand:"SOCOMEC", model:"DELPHYS-GP 2.0", sn:"17100389791001", pm:"4 ครั้ง"},
-      {loc:"Saraburi Phase 1 (อาคาร UT)", name:"UPS2B", brand:"SOCOMEC", model:"DELPHYS-GP 2.0", sn:"17100389790001", pm:"4 ครั้ง"},
-      {loc:"Saraburi Phase 1 (อาคาร UT)", name:"UPS2C", brand:"SOCOMEC", model:"DELPHYS-GP 2.0", sn:"17100389789001", pm:"4 ครั้ง"},
-      {loc:"Saraburi Phase 1 (อาคาร UT)", name:"UPS2D", brand:"SOCOMEC", model:"DELPHYS-GP 2.0", sn:"17100389788001", pm:"4 ครั้ง"},
+      {loc:"Saraburi Phase 1 (อาคาร UT)", name:"UPS2A", brand:"SOCOMEC", model:"DELPHYS-GP 2.0", sn:"*************1", pm:"4 ครั้ง"},
+      {loc:"Saraburi Phase 1 (อาคาร UT)", name:"UPS2B", brand:"SOCOMEC", model:"DELPHYS-GP 2.0", sn:"*************1", pm:"4 ครั้ง"},
+      {loc:"Saraburi Phase 1 (อาคาร UT)", name:"UPS2C", brand:"SOCOMEC", model:"DELPHYS-GP 2.0", sn:"*************1", pm:"4 ครั้ง"},
+      {loc:"Saraburi Phase 1 (อาคาร UT)", name:"UPS2D", brand:"SOCOMEC", model:"DELPHYS-GP 2.0", sn:"*************1", pm:"4 ครั้ง"},
       {loc:"Saraburi Office Shaft", name:"Office UPS", brand:"Cyber", model:"Cyber HSTP3T60KE", sn:"BBFFZ0000003", pm:"4 ครั้ง"}
     ],
     battery: [
@@ -378,20 +394,24 @@
     po26: [
       {num:"1", date:"25/02/2569", po:"P007-INET260200011", item:"Battery Replacement Butterfly Bldg 2 - Fiamm 12FIT201 (12V 195Ah) Warranty 5 yrs", ship:"180-210 วัน", prog:"Wait Update", install:"Wait Update", note:"สินค้าสั่งผลิตพิเศษ (By order)"},
       {num:"2", date:"26/02/2568", po:"P007-INET260200016", item:"Battery Replacement 336 EA - Fiamm Model 12FLB400P (12V 105AH) for 8x 400kVA UPS Day1-Day2", ship:"180-210 วัน", prog:"Update 21/04/2569", install:"Wait Update", note:"สินค้าอยู่ระหว่างขนส่งทางเรือ มาถึงไทยประมาณมิถุนายน 2569 ติดตั้ง ต.ค. 2569"}
+    ],
+    air: [
+      {phase:"แอร์เฟส 1", brand:"Emerson Network Power", model:"P2070DC1N2HL12L1A07ACE000 (P/N: F0119200 / INET)", sn:"21F0119200217B010002", tech:"ควบคุมอุณหภูมิและความชื้นแม่นยำสูง", date:"13/11/2017"},
+      {phase:"แอร์เฟส 2", brand:"Vertiv / Liebert", model:"P3180DC1N20L02L1A07ACE0XX (Site ID: DC2 / Tag: 07)", sn:"21F01206542186020003", tech:"Power: 380-415V, FL: 12.9A, Max Press: 1.6 MPa, Wt: 810/970 kg", date:"ปี 2021"}
     ]
   };
 
-  let db = JSON.parse(localStorage.getItem('idc3_master_db_v5')) || defaultData;
+  let db = JSON.parse(localStorage.getItem('idc3_master_db_v6')) || defaultData;
   let currentEditTable = '', currentEditIndex = -1;
 
   function saveData() {
-    localStorage.setItem('idc3_master_db_v5', JSON.stringify(db));
+    localStorage.setItem('idc3_master_db_v6', JSON.stringify(db));
     renderAll();
   }
 
   function resetData() {
     if(confirm('ต้องการรีเซ็ตข้อมูลทั้งหมดกลับเป็นค่าเริ่มต้นใช่หรือไม่?')) {
-      localStorage.removeItem('idc3_master_db_v5');
+      localStorage.removeItem('idc3_master_db_v6');
       db = JSON.parse(JSON.stringify(defaultData));
       renderAll();
     }
@@ -412,7 +432,6 @@
       <td><button class="btn btn-sm" onclick="openEditModal('battery', ${i})">แก้ไข</button> <button class="btn btn-sm btn-danger" onclick="deleteRow('battery', ${i})">ลบ</button></td></tr>
     `).join('');
 
-    // หน้า Spare Parts (ผูก Event คลิกที่ชื่อระบบ)
     document.getElementById('tbl-spare').innerHTML = db.spare.map((s, i) => `
       <tr>
         <td><span class="ups-link" onclick="showSpareDetail('${s.sys}')">${s.sys}</span></td>
@@ -439,6 +458,11 @@
     document.getElementById('tbl-po26').innerHTML = db.po26.map((p, i) => `
       <tr><td>${p.num}</td><td>${p.date}</td><td><b>${p.po}</b></td><td>${p.item}</td><td>${p.ship}</td><td>${p.prog}</td><td>${p.install}</td><td>${p.note}</td>
       <td><button class="btn btn-sm" onclick="openEditModal('po26', ${i})">แก้ไข</button> <button class="btn btn-sm btn-danger" onclick="deleteRow('po26', ${i})">ลบ</button></td></tr>
+    `).join('');
+
+    document.getElementById('tbl-air').innerHTML = db.air.map((a, i) => `
+      <tr><td><b>${a.phase}</b></td><td>${a.brand}</td><td>${a.model}</td><td>${a.sn}</td><td>${a.tech}</td><td>${a.date}</td>
+      <td><button class="btn btn-sm" onclick="openEditModal('air', ${i})">แก้ไข</button> <button class="btn btn-sm btn-danger" onclick="deleteRow('air', ${i})">ลบ</button></td></tr>
     `).join('');
   }
 
@@ -481,7 +505,6 @@
     document.getElementById('detailModal').style.display = 'flex';
   }
 
-  // ฟังก์ชันแสดงรายละเอียดชิ้นส่วนอะไหล่เมื่อคลิกที่ชื่อระบบในหน้า Spare Parts
   function showSpareDetail(sysName) {
     const matchedParts = db.spare.filter(s => s.sys.includes(sysName));
     document.getElementById('detailTitle').textContent = `⚙️ รายละเอียดชิ้นส่วนและแผนรอบเปลี่ยนอะไหล่: ${sysName}`;
