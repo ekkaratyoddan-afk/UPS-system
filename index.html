@@ -31,11 +31,10 @@
   .section-title{font-size:16px;font-weight:700;margin:20px 0 12px;color:#2b6cb0;display:flex;align-items:center;justify-content:space-between}
 
   /* Summary Cards */
-  .cards-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:20px}
-  .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+  .cards-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:20px}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;box-shadow:0 1px 3px rgba(0,0,0,.05);position:relative}
   .card .label{color:var(--muted);font-size:11.5px;text-transform:uppercase;letter-spacing:.5px;font-weight:600}
-  .card .value{font-size:24px;font-weight:700;margin-top:6px;color:#1a202c}
-  .card .unit{font-size:13px;color:var(--muted);font-weight:normal}
+  .card .value{font-size:15px;font-weight:700;margin-top:6px;color:#1a202c;white-space:pre-line}
 
   /* Tables */
   .table-box{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow-x:auto;margin-bottom:20px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
@@ -61,7 +60,7 @@
   .modal-content h3{margin-bottom:16px;color:#1a202c}
   .form-group{margin-bottom:12px}
   .form-group label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px;font-weight:600}
-  .form-group input{width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:6px;font-size:13px}
+  .form-group input, .form-group textarea{width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:6px;font-size:13px;font-family:inherit}
 
   .grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(450px,1fr));gap:20px}
   .chart-container{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
@@ -152,25 +151,10 @@
 
 <!-- ================= TAB 2: BATTERY DEEP DIVE ================= -->
 <div id="t2" class="tab-content">
-  <div class="section-title">🔋 เกณฑ์ความต้านทาน (Impedance) แยกตามขนาด UPS</div>
-  <div class="cards-grid" style="margin-bottom:20px">
-    <div class="card" style="border-left:4px solid var(--crit)">
-      <div class="label">UPS 400kVA (Baseline 3.6 mΩ)</div>
-      <div class="value" style="font-size:16px;margin-top:4px;color:var(--crit)">เปลี่ยน: ≥ 4.68 mΩ (+30%)</div>
-      <div class="value" style="font-size:16px;margin-top:2px;color:var(--warn)">รับได้: ≤ 4.32 mΩ (+20%)</div>
-      <div class="value" style="font-size:16px;margin-top:2px;color:var(--ok)">ปลอดภัย: ≤ 3.96 mΩ (+10%)</div>
-    </div>
-    <div class="card" style="border-left:4px solid var(--warn)">
-      <div class="label">UPS 30kVA (Standard 9Ah)</div>
-      <div class="value" style="font-size:16px;margin-top:4px;color:var(--crit)">เปลี่ยน: ตามค่า IR ผู้ผลิต / ค่าความจุลดลง >20%</div>
-      <div class="value" style="font-size:16px;margin-top:2px;color:var(--ok)">ปลอดภัย: ตรวจวัด IR รายไตรมาสปกติ</div>
-    </div>
-    <div class="card" style="border-left:4px solid var(--primary)">
-      <div class="label">UPS 60kVA Office (Standard 56Ah)</div>
-      <div class="value" style="font-size:16px;margin-top:4px;color:var(--crit)">เปลี่ยน: ค่า IR สูงผิดปกติ / สำรองไฟไม่ได้ตามเกณฑ์</div>
-      <div class="value" style="font-size:16px;margin-top:2px;color:var(--ok)">ปลอดภัย: ตรวจวัด IR รายไตรมาสปกติ</div>
-    </div>
+  <div class="section-title">🔋 เกณฑ์ความต้านทาน (Impedance) แยกตามขนาด UPS
+    <button class="btn btn-sm" onclick="openAddModal('impedance')">+ เพิ่มเกณฑ์</button>
   </div>
+  <div class="cards-grid" id="cards-impedance" style="margin-bottom:20px"></div>
   
   <div class="section-title">📋 ตารางรอบเปลี่ยนแบตเตอรี่ราย String
     <button class="btn btn-sm" onclick="openAddModal('battery')">+ เพิ่มข้อมูลแบต</button>
@@ -313,12 +297,17 @@
   </div>
 </div>
 
-<footer>IDC3 Master Infrastructure Dashboard & Editor — เพิ่มปุ่มรีเฟรชหน้าจอเรียบร้อย</footer>
+<footer>IDC3 Master Infrastructure Dashboard & Editor — เพิ่มระบบจัดการเกณฑ์ Impedance เรียบร้อย</footer>
 
 <script>
   let loadChartInstance = null;
 
   const defaultData = {
+    impedance: [
+      {title:"UPS 400KVA (BASELINE 3.6 MΩ)", color:"var(--crit)", content:"เปลี่ยน: ≥ 4.68 mΩ (+30%)\nรับได้: ≤ 4.32 mΩ (+20%)\nปลอดภัย: ≤ 3.96 mΩ (+10%)"},
+      {title:"UPS 30KVA (STANDARD 9AH)", color:"var(--warn)", content:"เปลี่ยน: ตามค่า IR ผู้ผลิต / ค่าความจุลดลง >20%\nปลอดภัย: ตรวจวัด IR รายไตรมาสปกติ"},
+      {title:"UPS 60KVA OFFICE (STANDARD 56AH)", color:"var(--primary)", content:"เปลี่ยน: ค่า IR สูงผิดปกติ / สำรองไฟไม่ได้ตามเกณฑ์\nปลอดภัย: ตรวจวัด IR รายไตรมาสปกติ"}
+    ],
     load: [
       {name:"UPS1A", cap:"400 kVA / 400 kW", kw:101, status:"● ปกติ"},
       {name:"UPS1B", cap:"400 kVA / 400 kW", kw:76, status:"● ปกติ"},
@@ -409,11 +398,11 @@
     ]
   };
 
-  let db = JSON.parse(localStorage.getItem('idc3_master_db_v10')) || defaultData;
+  let db = JSON.parse(localStorage.getItem('idc3_master_db_v11')) || defaultData;
   let currentEditTable = '', currentEditIndex = -1;
 
   function saveData() {
-    localStorage.setItem('idc3_master_db_v10', JSON.stringify(db));
+    localStorage.setItem('idc3_master_db_v11', JSON.stringify(db));
     renderAll();
   }
 
@@ -428,6 +417,17 @@
       <div class="card"><div class="label">Total IT Load (Calculated)</div><div class="value">${totalKw.toFixed(1)} <span class="unit">kW</span></div></div>
       <div class="card"><div class="label">สถานะแจ้งเตือนวิกฤต</div><div class="value" style="color:var(--ok)">0 <span class="unit">ระบบ</span></div></div>
     `;
+
+    document.getElementById('cards-impedance').innerHTML = db.impedance.map((item, i) => `
+      <div class="card" style="border-left:4px solid ${item.color}">
+        <div class="label">${item.title}</div>
+        <div class="value">${item.content}</div>
+        <div style="margin-top:12px;display:flex;gap:6px">
+          <button class="btn btn-sm" onclick="openEditModal('impedance', ${i})">แก้ไข</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteRow('impedance', ${i})">ลบ</button>
+        </div>
+      </div>
+    `).join('');
 
     document.getElementById('tbl-load').innerHTML = db.load.map((item, i) => {
       let percent = ((item.kw / 400) * 100).toFixed(2);
@@ -599,7 +599,11 @@
     
     let html = '';
     for (let key in item) {
-      html += `<div class="form-group"><label>${key.toUpperCase()}</label><input type="text" id="m-${key}" value="${item[key]}"></div>`;
+      if (key === 'content') {
+        html += `<div class="form-group"><label>${key.toUpperCase()}</label><textarea id="m-${key}" rows="4">${item[key]}</textarea></div>`;
+      } else {
+        html += `<div class="form-group"><label>${key.toUpperCase()}</label><input type="text" id="m-${key}" value="${item[key]}"></div>`;
+      }
     }
     document.getElementById('modalFormFields').innerHTML = html;
     document.getElementById('editModal').style.display = 'flex';
@@ -613,7 +617,11 @@
     
     let html = '';
     for (let key in item) {
-      html += `<div class="form-group"><label>${key.toUpperCase()}</label><input type="text" id="m-${key}" value=""></div>`;
+      if (key === 'content') {
+        html += `<div class="form-group"><label>${key.toUpperCase()}</label><textarea id="m-${key}" rows="4"></textarea></div>`;
+      } else {
+        html += `<div class="form-group"><label>${key.toUpperCase()}</label><input type="text" id="m-${key}" value=""></div>`;
+      }
     }
     document.getElementById('modalFormFields').innerHTML = html;
     document.getElementById('editModal').style.display = 'flex';
