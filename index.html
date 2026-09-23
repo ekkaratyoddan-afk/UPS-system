@@ -78,7 +78,7 @@
     <div class="sub">ระบบฐานข้อมูลสารสนเทศและบริหารจัดการวิศวกรรม (UPS และระบบปรับอากาศ)</div>
   </div>
   <div class="header-actions">
-    <button class="btn btn-secondary btn-sm" onclick="resetData()">🔄 รีเซ็ตข้อมูลเริ่มต้น</button>
+    <button class="btn btn-secondary btn-sm" onclick="location.reload()">🔄 รีเฟรชหน้าจอ</button>
     <div class="status-badge"><span class="dot"></span> ระบบออนไลน์</div>
   </div>
 </header>
@@ -313,7 +313,7 @@
   </div>
 </div>
 
-<footer>IDC3 Master Infrastructure Dashboard & Editor — อัปเดตระบบแก้ไขโหลด UPS สำเร็จ</footer>
+<footer>IDC3 Master Infrastructure Dashboard & Editor — เพิ่มปุ่มรีเฟรชหน้าจอเรียบร้อย</footer>
 
 <script>
   let loadChartInstance = null;
@@ -409,20 +409,12 @@
     ]
   };
 
-  let db = JSON.parse(localStorage.getItem('idc3_master_db_v9')) || defaultData;
+  let db = JSON.parse(localStorage.getItem('idc3_master_db_v10')) || defaultData;
   let currentEditTable = '', currentEditIndex = -1;
 
   function saveData() {
-    localStorage.setItem('idc3_master_db_v9', JSON.stringify(db));
+    localStorage.setItem('idc3_master_db_v10', JSON.stringify(db));
     renderAll();
-  }
-
-  function resetData() {
-    if(confirm('ต้องการรีเซ็ตข้อมูลทั้งหมดกลับเป็นค่าเริ่มต้นใช่หรือไม่?')) {
-      localStorage.removeItem('idc3_master_db_v9');
-      db = JSON.parse(JSON.stringify(defaultData));
-      renderAll();
-    }
   }
 
   function renderAll() {
