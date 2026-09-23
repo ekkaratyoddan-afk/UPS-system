@@ -239,17 +239,15 @@
 
 <!-- ================= TAB 6: VENDOR & PM ================= -->
 <div id="t6" class="tab-content">
-  <div class="section-title">📞 รายชื่อ Vendor และตารางแผนบำรุงรักษาประจำปี 2026</div>
+  <div class="section-title">📞 รายชื่อ Vendor และตารางแผนบำรุงรักษาประจำปี 2026
+    <button class="btn btn-sm" onclick="openAddModal('vendor')">+ เพิ่ม Vendor</button>
+  </div>
   <div class="table-box">
     <table>
       <thead>
-        <tr><th>รายการระบบ / งาน</th><th>สถานที่ (Site)</th><th>Vendor ผู้ดูแล</th><th>ผู้ติดต่อหลัก</th><th>เบอร์โทรศัพท์</th><th>อีเมล / หมายเหตุ</th></tr>
+        <tr><th>รายการระบบ / งาน</th><th>สถานที่ (Site)</th><th>Vendor ผู้ดูแล</th><th>ผู้ติดต่อหลัก</th><th>เบอร์โทรศัพท์</th><th>อีเมล / หมายเหตุ</th><th>จัดการ</th></tr>
       </thead>
-      <tbody>
-        <tr><td><b>CRAH &amp; Water Leak</b></td><td>SRB Phase 1-2 (62 Unit)</td><td>Vertiv</td><td>Call Center / ชาตรี / วรชัย</td><td>***-***-****, ***-***-****</td><td>**********.**@********.***</td></tr>
-        <tr><td><b>UPS 400kVA &amp; 30kVA</b></td><td>SRB Phase 1</td><td>Socomec</td><td>Hotline / กนก บัวกอ / อัครวินท์</td><td>***-***-****, ***-***-****</td><td>*****.*****@*******.***</td></tr>
-        <tr><td><b>UPS 60kVA (Office)</b></td><td>SRB Office Shaft</td><td>MAXI / ดีอาร์เค</td><td>ทนงศักดิ์ / อัศนีย์ / ณัฐพงศ์</td><td>***-***-****, ***-***-****</td><td>*******.*@*************.**.**</td></tr>
-      </tbody>
+      <tbody id="tbl-vendor"></tbody>
     </table>
   </div>
 </div>
@@ -322,7 +320,7 @@
   </div>
 </div>
 
-<footer>IDC3 Master Infrastructure Dashboard & Editor — เพิ่มระบบจัดการสเปกแอร์เรียบร้อย</footer>
+<footer>IDC3 Master Infrastructure Dashboard & Editor — อัปเดตระบบจัดการ Vendor เรียบร้อย</footer>
 
 <script>
   const defaultData = {
@@ -398,20 +396,25 @@
     air: [
       {phase:"แอร์เฟส 1", brand:"Emerson Network Power", model:"P2070DC1N2HL12L1A07ACE000 (P/N: F0119200 / INET)", sn:"21F0119200217B010002", tech:"ควบคุมอุณหภูมิและความชื้นแม่นยำสูง", date:"13/11/2017"},
       {phase:"แอร์เฟส 2", brand:"Vertiv / Liebert", model:"P3180DC1N20L02L1A07ACE0XX (Site ID: DC2 / Tag: 07)", sn:"21F01206542186020003", tech:"Power: 380-415V, FL: 12.9A, Max Press: 1.6 MPa, Wt: 810/970 kg", date:"ปี 2021"}
+    ],
+    vendor: [
+      {system:"CRAH & Water Leak", site:"SRB Phase 1-2 (62 Unit)", vendor:"Vertiv", contact:"Call Center / ชาตรี / วรชัย", phone:"02-xxx-xxxx", email:"support@vertiv.com"},
+      {system:"UPS 400kVA & 30kVA", site:"SRB Phase 1", vendor:"Socomec", contact:"Hotline / กนก บัวกอ / อัครวินท์", phone:"02-xxx-xxxx", email:"support@socomec.com"},
+      {system:"UPS 60kVA (Office)", site:"SRB Office Shaft", vendor:"MAXI / ดีอาร์เค", contact:"ทนงศักดิ์ / อัศนีย์ / ณัฐพงศ์", phone:"02-xxx-xxxx", email:"support@maxi.co.th"}
     ]
   };
 
-  let db = JSON.parse(localStorage.getItem('idc3_master_db_v6')) || defaultData;
+  let db = JSON.parse(localStorage.getItem('idc3_master_db_v7')) || defaultData;
   let currentEditTable = '', currentEditIndex = -1;
 
   function saveData() {
-    localStorage.setItem('idc3_master_db_v6', JSON.stringify(db));
+    localStorage.setItem('idc3_master_db_v7', JSON.stringify(db));
     renderAll();
   }
 
   function resetData() {
     if(confirm('ต้องการรีเซ็ตข้อมูลทั้งหมดกลับเป็นค่าเริ่มต้นใช่หรือไม่?')) {
-      localStorage.removeItem('idc3_master_db_v6');
+      localStorage.removeItem('idc3_master_db_v7');
       db = JSON.parse(JSON.stringify(defaultData));
       renderAll();
     }
@@ -448,6 +451,11 @@
     document.getElementById('tbl-ec').innerHTML = db.ec.map((e, i) => `
       <tr><td><b>${e.no}</b></td><td>${e.date}</td><td>${e.time}</td><td>${e.item}</td><td>${e.desc}</td><td>${e.impact}</td>
       <td><button class="btn btn-sm" onclick="openEditModal('ec', ${i})">แก้ไข</button> <button class="btn btn-sm btn-danger" onclick="deleteRow('ec', ${i})">ลบ</button></td></tr>
+    `).join('');
+
+    document.getElementById('tbl-vendor').innerHTML = db.vendor.map((v, i) => `
+      <tr><td><b>${v.system}</b></td><td>${v.site}</td><td>${v.vendor}</td><td>${v.contact}</td><td>${v.phone}</td><td>${v.email}</td>
+      <td><button class="btn btn-sm" onclick="openEditModal('vendor', ${i})">แก้ไข</button> <button class="btn btn-sm btn-danger" onclick="deleteRow('vendor', ${i})">ลบ</button></td></tr>
     `).join('');
 
     document.getElementById('tbl-po25').innerHTML = db.po25.map((p, i) => `
