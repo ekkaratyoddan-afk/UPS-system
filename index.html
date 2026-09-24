@@ -157,12 +157,15 @@
   <div class="cards-grid" id="cards-impedance" style="margin-bottom:20px"></div>
   
   <div class="section-title">📋 ตารางรอบเปลี่ยนแบตเตอรี่ราย String
-    <button class="btn btn-sm" onclick="openAddModal('battery')">+ เพิ่มข้อมูลแบต</button>
+    <div style="display:flex;gap:6px">
+      <button class="btn btn-sm btn-secondary" onclick="openHeaderEditModal('batteryHeaders')">⚙️ แก้ไขหัวตาราง</button>
+      <button class="btn btn-sm" onclick="openAddModal('battery')">+ เพิ่มข้อมูลแบต</button>
+    </div>
   </div>
   <div class="table-box">
     <table>
       <thead>
-        <tr><th>กลุ่มอุปกรณ์ / String</th><th>จำนวนแบตเตอรี่</th><th>Vendor รอบ 1</th><th>เลขอ้างอิง NC (รอบ 1)</th><th>วันที่ติดตั้งรอบ 1</th><th>วันที่ครบรอบ 5 ปี (รอบ 2)</th><th>Vendor รอบ 2</th><th>เลขอ้างอิง NC (รอบ 2)</th><th>จัดการ</th></tr>
+        <tr id="tbl-battery-headers"></tr>
       </thead>
       <tbody id="tbl-battery"></tbody>
     </table>
@@ -297,12 +300,22 @@
   </div>
 </div>
 
-<footer>IDC3 Master Infrastructure Dashboard & Editor — เพิ่มระบบจัดการเกณฑ์ Impedance เรียบร้อย</footer>
+<footer>IDC3 Master Infrastructure Dashboard & Editor — เพิ่มระบบแก้ไขหัวตารางแบตเตอรี่เรียบร้อย</footer>
 
 <script>
   let loadChartInstance = null;
 
   const defaultData = {
+    batteryHeaders: {
+      h1: "กลุ่มอุปกรณ์ / String",
+      h2: "จำนวนแบตเตอรี่",
+      h3: "Vendor รอบ 1",
+      h4: "เลขอ้างอิง NC (รอบ 1)",
+      h5: "วันที่ติดตั้งรอบ 1",
+      h6: "วันที่ครบรอบ 5 ปี (รอบ 2)",
+      h7: "Vendor รอบ 2",
+      h8: "เลขอ้างอิง NC (รอบ 2)"
+    },
     impedance: [
       {title:"UPS 400KVA (BASELINE 3.6 MΩ)", color:"var(--crit)", content:"เปลี่ยน: ≥ 4.68 mΩ (+30%)\nรับได้: ≤ 4.32 mΩ (+20%)\nปลอดภัย: ≤ 3.96 mΩ (+10%)"},
       {title:"UPS 30KVA (STANDARD 9AH)", color:"var(--warn)", content:"เปลี่ยน: ตามค่า IR ผู้ผลิต / ค่าความจุลดลง >20%\nปลอดภัย: ตรวจวัด IR รายไตรมาสปกติ"},
@@ -398,11 +411,11 @@
     ]
   };
 
-  let db = JSON.parse(localStorage.getItem('idc3_master_db_v11')) || defaultData;
+  let db = JSON.parse(localStorage.getItem('idc3_master_db_v13')) || defaultData;
   let currentEditTable = '', currentEditIndex = -1;
 
   function saveData() {
-    localStorage.setItem('idc3_master_db_v11', JSON.stringify(db));
+    localStorage.setItem('idc3_master_db_v13', JSON.stringify(db));
     renderAll();
   }
 
@@ -428,6 +441,20 @@
         </div>
       </div>
     `).join('');
+
+    // Render Battery Table Headers
+    const bh = db.batteryHeaders;
+    document.getElementById('tbl-battery-headers').innerHTML = `
+      <th>${bh.h1}</th>
+      <th>${bh.h2}</th>
+      <th>${bh.h3}</th>
+      <th>${bh.h4}</th>
+      <th>${bh.h5}</th>
+      <th>${bh.h6}</th>
+      <th>${bh.h7}</th>
+      <th>${bh.h8}</th>
+      <th>จัดการ</th>
+    `;
 
     document.getElementById('tbl-load').innerHTML = db.load.map((item, i) => {
       let percent = ((item.kw / 400) * 100).toFixed(2);
@@ -461,8 +488,20 @@
     `).join('');
 
     document.getElementById('tbl-battery').innerHTML = db.battery.map((b, i) => `
-      <tr><td><b>${b.group}</b></td><td>${b.qty}</td><td>${b.v1}</td><td>${b.nc1}</td><td>${b.d1}</td><td><b>${b.d2}</b></td><td>${b.v2}</td><td>${b.nc2}</td>
-      <td><button class="btn btn-sm" onclick="openEditModal('battery', ${i})">แก้ไข</button> <button class="btn btn-sm btn-danger" onclick="deleteRow('battery', ${i})">ลบ</button></td></tr>
+      <tr>
+        <td><b>${b.group}</b></td>
+        <td>${b.qty}</td>
+        <td>${b.v1}</td>
+        <td>${b.nc1}</td>
+        <td>${b.d1}</td>
+        <td><b>${b.d2}</b></td>
+        <td>${b.v2}</td>
+        <td>${b.nc2}</td>
+        <td>
+          <button class="btn btn-sm" onclick="openEditModal('battery', ${i})">แก้ไข</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteRow('battery', ${i})">ลบ</button>
+        </td>
+      </tr>
     `).join('');
 
     document.getElementById('tbl-spare').innerHTML = db.spare.map((s, i) => `
@@ -591,6 +630,30 @@
     document.getElementById('detailModal').style.display = 'none';
   }
 
+  function openHeaderEditModal(type) {
+    currentEditTable = type;
+    currentEditIndex = -99; // โหมดพิเศษแก้หัวตาราง
+    const item = db[type];
+    document.getElementById('modalTitle').textContent = `⚙️ แก้ไขหัวตาราง (รอบเปลี่ยนแบตเตอรี่)`;
+    
+    let html = '';
+    const labels = {
+      h1: "คอลัมน์ 1 (กลุ่มอุปกรณ์)",
+      h2: "คอลัมน์ 2 (จำนวนแบตเตอรี่)",
+      h3: "คอลัมน์ 3 (Vendor รอบ 1)",
+      h4: "คอลัมน์ 4 (เลขอ้างอิง NC 1)",
+      h5: "คอลัมน์ 5 (วันที่ติดตั้ง 1)",
+      h6: "คอลัมน์ 6 (วันที่ครบรอบ 2)",
+      h7: "คอลัมน์ 7 (Vendor รอบ 2)",
+      h8: "คอลัมน์ 8 (เลขอ้างอิง NC 2)"
+    };
+    for (let key in item) {
+      html += `<div class="form-group"><label>${labels[key] || key}</label><input type="text" id="m-${key}" value="${item[key]}"></div>`;
+    }
+    document.getElementById('modalFormFields').innerHTML = html;
+    document.getElementById('editModal').style.display = 'flex';
+  }
+
   function openEditModal(table, index) {
     currentEditTable = table;
     currentEditIndex = index;
@@ -632,18 +695,28 @@
   }
 
   function saveModalData() {
-    const item = {};
-    const sample = db[currentEditTable][0] || {};
-    for (let key in sample) {
-      let val = document.getElementById(`m-${key}`).value;
-      if(key === 'kw') val = Number(val) || 0;
-      item[key] = val;
-    }
-
-    if (currentEditIndex === -1) {
-      db[currentEditTable].push(item);
+    if (currentEditIndex === -99) {
+      // โหมดบันทึกหัวตาราง
+      const item = {};
+      const sample = db[currentEditTable];
+      for (let key in sample) {
+        item[key] = document.getElementById(`m-${key}`).value;
+      }
+      db[currentEditTable] = item;
     } else {
-      db[currentEditTable][currentEditIndex] = item;
+      const item = {};
+      const sample = db[currentEditTable][0] || {};
+      for (let key in sample) {
+        let val = document.getElementById(`m-${key}`).value;
+        if(key === 'kw') val = Number(val) || 0;
+        item[key] = val;
+      }
+
+      if (currentEditIndex === -1) {
+        db[currentEditTable].push(item);
+      } else {
+        db[currentEditTable][currentEditIndex] = item;
+      }
     }
 
     saveData();
