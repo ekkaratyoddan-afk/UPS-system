@@ -225,7 +225,7 @@
   <div class="table-box">
     <table>
       <thead>
-        <tr><th>รายการระบบ / งาน</th><th>สถานที่ (Site)</th><th>Vendor ผู้ดูแล</th><th>ผู้ติดต่อหลัก</th><th>เบอร์โทรศัพท์</th><th>อีเมล / หมายเหตุ</th><th>จัดการ</th></tr>
+        <tr><th>รายการระบบ / งาน</th><th>สถานที่ (Site)</th><th>Vendor ผู้ดูแล</th><th>ผู้ติดต่อหลัก</th><th>เบอร์โทรศัพท์</th><th>รอบวันที่ทำการ PM</th><th>อีเมล / หมายเหตุ</th><th>จัดการ</th></tr>
       </thead>
       <tbody id="tbl-vendor"></tbody>
     </table>
@@ -300,7 +300,7 @@
   </div>
 </div>
 
-<footer>IDC3 Master Infrastructure Dashboard & Editor — เพิ่มระบบแก้ไขหัวตารางแบตเตอรี่เรียบร้อย</footer>
+<footer>IDC3 Master Infrastructure Dashboard & Editor — เพิ่มฟังก์ชันรอบวันที่ทำการ PM เรียบร้อย</footer>
 
 <script>
   let loadChartInstance = null;
@@ -405,17 +405,17 @@
       {phase:"แอร์เฟส 2", brand:"Vertiv / Liebert", model:"P3180DC1N20L02L1A07ACE0XX (Site ID: DC2 / Tag: 07)", sn:"21F01206542186020003", tech:"Power: 380-415V, FL: 12.9A, Max Press: 1.6 MPa, Wt: 810/970 kg", date:"ปี 2021"}
     ],
     vendor: [
-      {system:"CRAH & Water Leak", site:"SRB Phase 1-2 (62 Unit)", vendor:"Vertiv", contact:"Call Center / ชาตรี / วรชัย", phone:"02-xxx-xxxx", email:"support@vertiv.com"},
-      {system:"UPS 400kVA & 30kVA", site:"SRB Phase 1", vendor:"Socomec", contact:"Hotline / กนก บัวกอ / อัครวินท์", phone:"02-xxx-xxxx", email:"support@socomec.com"},
-      {system:"UPS 60kVA (Office)", site:"SRB Office Shaft", vendor:"MAXI / ดีอาร์เค", contact:"ทนงศักดิ์ / อัศนีย์ / ณัฐพงศ์", phone:"02-xxx-xxxx", email:"support@maxi.co.th"}
+      {system:"CRAH & Water Leak", site:"SRB Phase 1-2 (62 Unit)", vendor:"Vertiv", contact:"Call Center / ชาตรี / วรชัย", phone:"02-xxx-xxxx", pmDate:"Q1: มี.ค., Q2: มิ.ย., Q3: ก.ย., Q4: ธ.ค.", email:"support@vertiv.com"},
+      {system:"UPS 400kVA & 30kVA", site:"SRB Phase 1", vendor:"Socomec", contact:"Hotline / กนก บัวกอ / อัครวินท์", phone:"02-xxx-xxxx", pmDate:"ทุกๆ 3 เดือน (รอบ ก.พ., พ.ค., ส.ค., พ.ย.)", email:"support@socomec.com"},
+      {system:"UPS 60kVA (Office)", site:"SRB Office Shaft", vendor:"MAXI / ดีอาร์เค", contact:"ทนงศักดิ์ / อัศนีย์ / ณัฐพงศ์", phone:"02-xxx-xxxx", pmDate:"ทุกๆ 6 เดือน (รอบ เม.ย., ต.ค.)", email:"support@maxi.co.th"}
     ]
   };
 
-  let db = JSON.parse(localStorage.getItem('idc3_master_db_v13')) || defaultData;
+  let db = JSON.parse(localStorage.getItem('idc3_master_db_v14')) || defaultData;
   let currentEditTable = '', currentEditIndex = -1;
 
   function saveData() {
-    localStorage.setItem('idc3_master_db_v13', JSON.stringify(db));
+    localStorage.setItem('idc3_master_db_v14', JSON.stringify(db));
     renderAll();
   }
 
@@ -442,7 +442,6 @@
       </div>
     `).join('');
 
-    // Render Battery Table Headers
     const bh = db.batteryHeaders;
     document.getElementById('tbl-battery-headers').innerHTML = `
       <th>${bh.h1}</th>
@@ -523,8 +522,19 @@
     `).join('');
 
     document.getElementById('tbl-vendor').innerHTML = db.vendor.map((v, i) => `
-      <tr><td><b>${v.system}</b></td><td>${v.site}</td><td>${v.vendor}</td><td>${v.contact}</td><td>${v.phone}</td><td>${v.email}</td>
-      <td><button class="btn btn-sm" onclick="openEditModal('vendor', ${i})">แก้ไข</button> <button class="btn btn-sm btn-danger" onclick="deleteRow('vendor', ${i})">ลบ</button></td></tr>
+      <tr>
+        <td><b>${v.system}</b></td>
+        <td>${v.site}</td>
+        <td>${v.vendor}</td>
+        <td>${v.contact}</td>
+        <td>${v.phone}</td>
+        <td><b style="color:var(--primary)">${v.pmDate || '-'}</b></td>
+        <td>${v.email}</td>
+        <td>
+          <button class="btn btn-sm" onclick="openEditModal('vendor', ${i})">แก้ไข</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteRow('vendor', ${i})">ลบ</button>
+        </td>
+      </tr>
     `).join('');
 
     document.getElementById('tbl-po25').innerHTML = db.po25.map((p, i) => `
@@ -632,7 +642,7 @@
 
   function openHeaderEditModal(type) {
     currentEditTable = type;
-    currentEditIndex = -99; // โหมดพิเศษแก้หัวตาราง
+    currentEditIndex = -99;
     const item = db[type];
     document.getElementById('modalTitle').textContent = `⚙️ แก้ไขหัวตาราง (รอบเปลี่ยนแบตเตอรี่)`;
     
@@ -696,7 +706,6 @@
 
   function saveModalData() {
     if (currentEditIndex === -99) {
-      // โหมดบันทึกหัวตาราง
       const item = {};
       const sample = db[currentEditTable];
       for (let key in sample) {
