@@ -12,7 +12,7 @@
   }
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:"Segoe UI",Tahoma,"Sarabun",sans-serif;background:var(--bg);color:var(--txt);padding:20px;line-height:1.5}
-  
+
   /* Login Overlay */
   #loginOverlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);display:flex;justify-content:center;align-items:center;z-index:9999}
   .login-box{background:var(--card);padding:30px;border-radius:12px;width:100%;max-width:380px;box-shadow:0 4px 15px rgba(0,0,0,0.2);text-align:center}
@@ -27,7 +27,6 @@
   .status-badge{background:#ebf8ff;color:var(--primary);padding:6px 14px;border-radius:99px;font-weight:600;font-size:13px;display:flex;align-items:center;gap:6px}
   .dot{width:8px;height:8px;background:var(--ok);border-radius:50%;display:inline-block}
 
-  /* Navigation Tabs */
   .tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
   .tab-btn{background:var(--card);border:1px solid var(--border);padding:10px 14px;border-radius:8px;cursor:pointer;font-weight:600;color:var(--muted);font-size:12.5px;transition:all .2s}
   .tab-btn.active{background:var(--primary);color:#fff;border-color:var(--primary)}
@@ -37,13 +36,11 @@
 
   .section-title{font-size:16px;font-weight:700;margin:20px 0 12px;color:#2b6cb0;display:flex;align-items:center;justify-content:space-between}
 
-  /* Summary Cards */
   .cards-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:20px}
   .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;box-shadow:0 1px 3px rgba(0,0,0,.05);position:relative}
   .card .label{color:var(--muted);font-size:11.5px;text-transform:uppercase;letter-spacing:.5px;font-weight:600}
   .card .value{font-size:15px;font-weight:700;margin-top:6px;color:#1a202c;white-space:pre-line}
 
-  /* Tables */
   .table-box{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow-x:auto;margin-bottom:20px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
   table{width:100%;border-collapse:collapse;font-size:12.5px;white-space:nowrap}
   th{background:#f7fafc;color:var(--muted);text-align:left;padding:12px 14px;font-weight:600;border-bottom:1px solid var(--border)}
@@ -58,17 +55,26 @@
   .btn-secondary{background:var(--muted)}
   .btn-block{width:100%;padding:10px;font-size:14px;margin-top:10px}
 
-  /* Clickable Link */
   .ups-link{color:var(--primary);cursor:pointer;font-weight:700;text-decoration:underline}
   .ups-link:hover{color:#2b6cb0}
 
-  /* Modal Edit & Detail */
+  /* Image styles */
+  .thumb{height:42px;width:auto;max-width:90px;object-fit:cover;border-radius:6px;border:1px solid var(--border);cursor:pointer;transition:transform .15s}
+  .thumb:hover{transform:scale(1.06)}
+  .no-img{color:var(--muted);font-size:11px;font-style:italic}
+  #imgViewer{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);justify-content:center;align-items:center;z-index:2000;padding:30px;cursor:zoom-out}
+  #imgViewer img{max-width:95%;max-height:90%;border-radius:8px;box-shadow:0 6px 24px rgba(0,0,0,.5)}
+  .img-preview{margin-top:8px;max-height:130px;border-radius:8px;border:1px solid var(--border);display:none}
+  .upload-row{display:flex;gap:8px;align-items:center;margin-top:6px}
+
   .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);justify-content:center;align-items:center;z-index:1000}
   .modal-content{background:var(--card);padding:24px;border-radius:12px;width:100%;max-width:750px;box-shadow:0 4px 12px rgba(0,0,0,0.15);max-height:85vh;overflow-y:auto}
   .modal-content h3{margin-bottom:16px;color:#1a202c}
   .form-group{margin-bottom:12px;text-align:left}
   .form-group label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px;font-weight:600}
   .form-group input, .form-group textarea{width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:6px;font-size:13px;font-family:inherit}
+  .form-group input[type=file]{padding:5px;background:#f7fafc}
+  .hint{font-size:11px;color:var(--muted);margin-top:4px}
 
   .grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(450px,1fr));gap:20px}
   .chart-container{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
@@ -97,6 +103,11 @@
   </div>
 </div>
 
+<!-- Image Viewer -->
+<div id="imgViewer" onclick="closeImgViewer()">
+  <img id="imgViewerSrc" src="" alt="preview">
+</div>
+
 <header>
   <div>
     <h1>⚡ IDC3 Master Infrastructure Dashboard &amp; Editor</h1>
@@ -108,7 +119,6 @@
   </div>
 </header>
 
-<!-- Navigation Tabs -->
 <div class="tabs">
   <button class="tab-btn active" onclick="switchTab(event, 't1')">📊 1. ภาพรวมระบบ</button>
   <button class="tab-btn" onclick="switchTab(event, 't2')">🔋 2. รอบเปลี่ยนแบต</button>
@@ -121,7 +131,7 @@
   <button class="tab-btn" onclick="switchTab(event, 't9')">❄️ 9. Computer Room Air Handler</button>
 </div>
 
-<!-- ================= TAB 1: OVERVIEW ================= -->
+<!-- ================= TAB 1 ================= -->
 <div id="t1" class="tab-content active">
   <div class="cards-grid" id="cards-summary"></div>
 
@@ -131,7 +141,7 @@
   <div class="table-box">
     <table>
       <thead>
-        <tr><th>ชื่ออุปกรณ์</th><th>ขนาดพิกัด (Capacity)</th><th>โหลดปัจจุบัน (kW)</th><th>เปอร์เซ็นต์การใช้งาน (% Load)</th><th>สถานะ</th><th>จัดการ</th></tr>
+        <tr><th>รูปภาพ</th><th>ชื่ออุปกรณ์</th><th>ขนาดพิกัด (Capacity)</th><th>โหลดปัจจุบัน (kW)</th><th>เปอร์เซ็นต์การใช้งาน (% Load)</th><th>สถานะ</th><th>จัดการ</th></tr>
       </thead>
       <tbody id="tbl-load"></tbody>
     </table>
@@ -157,7 +167,7 @@
   <div class="table-box">
     <table>
       <thead>
-        <tr><th>สถานที่ (Location)</th><th>ชื่อย่อ (UPS/Unit)</th><th>ยี่ห้อ (Brand)</th><th>รุ่น (Model)</th><th>Serial Number</th><th>รอบ PM/ปี</th><th>จัดการ</th></tr>
+        <tr><th>รูปภาพ</th><th>สถานที่ (Location)</th><th>ชื่อย่อ (UPS/Unit)</th><th>ยี่ห้อ (Brand)</th><th>รุ่น (Model)</th><th>Serial Number</th><th>รอบ PM/ปี</th><th>จัดการ</th></tr>
       </thead>
       <tbody id="tbl-ups"></tbody>
     </table>
@@ -175,13 +185,13 @@
   </div>
 </div>
 
-<!-- ================= TAB 2: BATTERY DEEP DIVE ================= -->
+<!-- ================= TAB 2 ================= -->
 <div id="t2" class="tab-content">
   <div class="section-title">🔋 เกณฑ์ความต้านทาน (Impedance) แยกตามขนาด UPS
     <button class="btn btn-sm" onclick="openAddModal('impedance')">+ เพิ่มเกณฑ์</button>
   </div>
   <div class="cards-grid" id="cards-impedance" style="margin-bottom:20px"></div>
-  
+
   <div class="section-title">📋 ตารางรอบเปลี่ยนแบตเตอรี่ราย String
     <div style="display:flex;gap:6px">
       <button class="btn btn-sm btn-secondary" onclick="openHeaderEditModal('batteryHeaders')">⚙️ แก้ไขหัวตาราง</button>
@@ -190,15 +200,13 @@
   </div>
   <div class="table-box">
     <table>
-      <thead>
-        <tr id="tbl-battery-headers"></tr>
-      </thead>
+      <thead><tr id="tbl-battery-headers"></tr></thead>
       <tbody id="tbl-battery"></tbody>
     </table>
   </div>
 </div>
 
-<!-- ================= TAB 3: SPARE PARTS 20 YEARS ================= -->
+<!-- ================= TAB 3 ================= -->
 <div id="t3" class="tab-content">
   <div class="section-title">📅 แผนทดแทนอะไหล่ตามรอบอายุการใช้งาน (คลิกที่ชื่อระบบเพื่อดูรายละเอียดชิ้นส่วน)
     <button class="btn btn-sm" onclick="openAddModal('spare')">+ เพิ่มอะไหล่</button>
@@ -206,14 +214,14 @@
   <div class="table-box">
     <table>
       <thead>
-        <tr><th>ระบบ / รุ่นอุปกรณ์</th><th>รายการอะไหล่</th><th>ตำแหน่ง</th><th>จำนวน</th><th>รอบเปลี่ยน</th><th>ปีรอบหลัก</th><th>จัดการ</th></tr>
+        <tr><th>รูปภาพ</th><th>ระบบ / รุ่นอุปกรณ์</th><th>รายการอะไหล่</th><th>ตำแหน่ง</th><th>จำนวน</th><th>รอบเปลี่ยน</th><th>ปีรอบหลัก</th><th>จัดการ</th></tr>
       </thead>
       <tbody id="tbl-spare"></tbody>
     </table>
   </div>
 </div>
 
-<!-- ================= TAB 4: NORMAL CHANGE (NC) ================= -->
+<!-- ================= TAB 4 ================= -->
 <div id="t4" class="tab-content">
   <div class="section-title">📋 ประวัติใบงานการเปลี่ยนแปลงตามแผนปกติ (Normal Change - NC Records)
     <button class="btn btn-sm" onclick="openAddModal('nc')">+ เพิ่มใบงาน NC</button>
@@ -221,14 +229,14 @@
   <div class="table-box">
     <table>
       <thead>
-        <tr><th>Ticket No.</th><th>Ticket Date</th><th>Type</th><th>Configuration Item</th><th>Subject / รายละเอียด</th><th>Priority</th><th>จัดการ</th></tr>
+        <tr><th>รูปภาพ</th><th>Ticket No.</th><th>Ticket Date</th><th>Type</th><th>Configuration Item</th><th>Subject / รายละเอียด</th><th>Priority</th><th>จัดการ</th></tr>
       </thead>
       <tbody id="tbl-nc"></tbody>
     </table>
   </div>
 </div>
 
-<!-- ================= TAB 5: EMERGENCY CHANGE (EC) ================= -->
+<!-- ================= TAB 5 ================= -->
 <div id="t5" class="tab-content">
   <div class="section-title">🚨 ประวัติใบงานการเปลี่ยนแปลงฉุกเฉิน (Emergency Change - EC Records)
     <button class="btn btn-sm" onclick="openAddModal('ec')">+ เพิ่มใบงาน EC</button>
@@ -236,14 +244,14 @@
   <div class="table-box">
     <table>
       <thead>
-        <tr><th>Ticket No.</th><th>Date</th><th>Time</th><th>Configuration Item</th><th>Subject / รายละเอียดเหตุการณ์</th><th>Impact</th><th>จัดการ</th></tr>
+        <tr><th>รูปภาพ</th><th>Ticket No.</th><th>Date</th><th>Time</th><th>Configuration Item</th><th>Subject / รายละเอียดเหตุการณ์</th><th>Impact</th><th>จัดการ</th></tr>
       </thead>
       <tbody id="tbl-ec"></tbody>
     </table>
   </div>
 </div>
 
-<!-- ================= TAB 6: VENDOR & PM ================= -->
+<!-- ================= TAB 6 ================= -->
 <div id="t6" class="tab-content">
   <div class="section-title">📞 รายชื่อ Vendor และตารางแผนบำรุงรักษาประจำปี 2026
     <button class="btn btn-sm" onclick="openAddModal('vendor')">+ เพิ่ม Vendor</button>
@@ -251,14 +259,14 @@
   <div class="table-box">
     <table>
       <thead>
-        <tr><th>รายการระบบ / งาน</th><th>สถานที่ (Site)</th><th>Vendor ผู้ดูแล</th><th>ผู้ติดต่อหลัก</th><th>เบอร์โทรศัพท์</th><th>รอบวันที่ทำการ PM</th><th>อีเมล / หมายเหตุ</th><th>จัดการ</th></tr>
+        <tr><th>รูปภาพ</th><th>รายการระบบ / งาน</th><th>สถานที่ (Site)</th><th>Vendor ผู้ดูแล</th><th>ผู้ติดต่อหลัก</th><th>เบอร์โทรศัพท์</th><th>รอบวันที่ทำการ PM</th><th>อีเมล / หมายเหตุ</th><th>จัดการ</th></tr>
       </thead>
       <tbody id="tbl-vendor"></tbody>
     </table>
   </div>
 </div>
 
-<!-- ================= TAB 7: PO เปลี่ยนแบต 2025 ================= -->
+<!-- ================= TAB 7 ================= -->
 <div id="t7" class="tab-content">
   <div class="section-title">📦 ติดตามสถานะใบสั่งซื้อ (PO เปลี่ยนแบตเตอรี่ปี 2025)
     <button class="btn btn-sm" onclick="openAddModal('po25')">+ เพิ่ม PO 2025</button>
@@ -266,14 +274,14 @@
   <div class="table-box">
     <table>
       <thead>
-        <tr><th>ลำดับ</th><th>วันที่ออก PO</th><th>เลข PO</th><th>รายการ</th><th>วันจัดส่งสินค้า</th><th>วันที่ความคืบหน้า</th><th>วันติดตั้ง</th><th>หมายเหตุ</th><th>จัดการ</th></tr>
+        <tr><th>รูปภาพ</th><th>ลำดับ</th><th>วันที่ออก PO</th><th>เลข PO</th><th>รายการ</th><th>วันจัดส่งสินค้า</th><th>วันที่ความคืบหน้า</th><th>วันติดตั้ง</th><th>หมายเหตุ</th><th>จัดการ</th></tr>
       </thead>
       <tbody id="tbl-po25"></tbody>
     </table>
   </div>
 </div>
 
-<!-- ================= TAB 8: PO เปลี่ยนแบต 2026 ================= -->
+<!-- ================= TAB 8 ================= -->
 <div id="t8" class="tab-content">
   <div class="section-title">📦 ติดตามสถานะใบสั่งซื้อ (PO เปลี่ยนแบตเตอรี่ปี 2026)
     <button class="btn btn-sm" onclick="openAddModal('po26')">+ เพิ่ม PO 2026</button>
@@ -281,14 +289,14 @@
   <div class="table-box">
     <table>
       <thead>
-        <tr><th>ลำดับ</th><th>วันที่ออก PO</th><th>เลข PO</th><th>รายการ</th><th>วันจัดส่งสินค้า</th><th>วันที่ความคืบหน้า</th><th>วันติดตั้ง</th><th>หมายเหตุ</th><th>จัดการ</th></tr>
+        <tr><th>รูปภาพ</th><th>ลำดับ</th><th>วันที่ออก PO</th><th>เลข PO</th><th>รายการ</th><th>วันจัดส่งสินค้า</th><th>วันที่ความคืบหน้า</th><th>วันติดตั้ง</th><th>หมายเหตุ</th><th>จัดการ</th></tr>
       </thead>
       <tbody id="tbl-po26"></tbody>
     </table>
   </div>
 </div>
 
-<!-- ================= TAB 9: AIR CONDITIONER SPECS ================= -->
+<!-- ================= TAB 9 ================= -->
 <div id="t9" class="tab-content">
   <div class="section-title">❄️ รายละเอียดสเปกเครื่องปรับอากาศภายในห้อง Data Center (IDC3)
     <button class="btn btn-sm" onclick="openAddModal('air')">+ เพิ่มข้อมูลแอร์</button>
@@ -296,14 +304,14 @@
   <div class="table-box">
     <table>
       <thead>
-        <tr><th>เฟส / พื้นที่</th><th>แบรนด์ (Brand)</th><th>รุ่น (Model)</th><th>Serial Number (S/N)</th><th>ข้อมูลทางเทคนิคหลัก</th><th>วันที่ผลิต / ติดตั้ง</th><th>จัดการ</th></tr>
+        <tr><th>รูปภาพ</th><th>เฟส / พื้นที่</th><th>แบรนด์ (Brand)</th><th>รุ่น (Model)</th><th>Serial Number (S/N)</th><th>ข้อมูลทางเทคนิคหลัก</th><th>วันที่ผลิต / ติดตั้ง</th><th>จัดการ</th></tr>
       </thead>
       <tbody id="tbl-air"></tbody>
     </table>
   </div>
 </div>
 
-<!-- Modal สำหรับแก้ไขข้อมูล -->
+<!-- Modal แก้ไขข้อมูล -->
 <div id="editModal" class="modal">
   <div class="modal-content">
     <h3 id="modalTitle">แก้ไขข้อมูล</h3>
@@ -315,10 +323,10 @@
   </div>
 </div>
 
-<!-- Modal สำหรับดูรายละเอียดชิ้นส่วนอะไหล่ (Spare Parts Detail) -->
+<!-- Modal รายละเอียด -->
 <div id="detailModal" class="modal">
   <div class="modal-content">
-    <h3 id="detailTitle">รายละเอียดแผนการเปลี่ยนอะไหล่</h3>
+    <h3 id="detailTitle">รายละเอียด</h3>
     <div id="detailContent"></div>
     <div style="display:flex;justify-content:flex-end;margin-top:16px">
       <button class="btn btn-secondary" onclick="closeDetailModal()">ปิดหน้าต่าง</button>
@@ -326,11 +334,12 @@
   </div>
 </div>
 
-<footer>IDC3 Master Infrastructure Dashboard & Editor — เพิ่มระบบ Login เรียบร้อย</footer>
+<footer>IDC3 Master Infrastructure Dashboard & Editor — รองรับระบบรูปภาพทุกตารางเรียบร้อย</footer>
 
 <script>
   let loadChartInstance = null;
 
+  /* ---------- LOGIN ---------- */
   function handleLogin() {
     const u = document.getElementById('userInput').value;
     const p = document.getElementById('passInput').value;
@@ -341,18 +350,45 @@
       document.getElementById('loginError').style.display = 'block';
     }
   }
-
-  function checkEnter(e) {
-    if(e.key === 'Enter') handleLogin();
-  }
-
-  // ตรวจสอบว่าเคยล็อกอินไว้ในแท็บนี้หรือยัง
+  function checkEnter(e){ if(e.key === 'Enter') handleLogin(); }
   window.onload = function() {
     if(sessionStorage.getItem('idc3_logged_in') === 'true') {
       document.getElementById('loginOverlay').style.display = 'none';
     }
   };
 
+  /* ---------- IMAGE HELPERS ---------- */
+  function showImgViewer(src){
+    document.getElementById('imgViewerSrc').src = src;
+    document.getElementById('imgViewer').style.display = 'flex';
+  }
+  function closeImgViewer(){
+    document.getElementById('imgViewer').style.display = 'none';
+  }
+  function imgCell(src){
+    if(!src) return '<span class="no-img">ไม่มีรูป</span>';
+    const safe = src.replace(/"/g,'&quot;');
+    return `<img class="thumb" src="${safe}" onclick="showImgViewer(this.src)" alt="img">`;
+  }
+  function handleImageUpload(evt, targetId, previewId){
+    const file = evt.target.files[0];
+    if(!file) return;
+    if(file.size > 900000){
+      alert('ไฟล์ใหญ่เกินไป (แนะนำไม่เกิน 900 KB)\nกรุณาย่อรูปก่อน หรือใช้วิธีวางลิงก์ URL แทนครับ');
+      evt.target.value = '';
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = function(e){
+      document.getElementById(targetId).value = e.target.result;
+      const pv = document.getElementById(previewId);
+      pv.src = e.target.result;
+      pv.style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+  }
+
+  /* ---------- DATA ---------- */
   const defaultData = {
     batteryHeaders: {
       h1: "กลุ่มอุปกรณ์ / String",
@@ -370,27 +406,27 @@
       {title:"UPS 60KVA OFFICE (STANDARD 56AH)", color:"var(--primary)", content:"เปลี่ยน: ค่า IR สูงผิดปกติ / สำรองไฟไม่ได้ตามเกณฑ์\nปลอดภัย: ตรวจวัด IR รายไตรมาสปกติ"}
     ],
     load: [
-      {name:"UPS1A", cap:"400 kVA / 400 kW", kw:101, status:"● ปกติ"},
-      {name:"UPS1B", cap:"400 kVA / 400 kW", kw:76, status:"● ปกติ"},
-      {name:"UPS1C", cap:"400 kVA / 400 kW", kw:106, status:"● ปกติ"},
-      {name:"UPS1D", cap:"400 kVA / 400 kW", kw:100, status:"● ปกติ"},
-      {name:"UPS2A", cap:"400 kVA / 400 kW", kw:85, status:"● ปกติ"},
-      {name:"UPS2B", cap:"400 kVA / 400 kW", kw:98, status:"● ปกติ"},
-      {name:"UPS2C", cap:"400 kVA / 400 kW", kw:88, status:"● ปกติ"},
-      {name:"UPS2D", cap:"400 kVA / 400 kW", kw:93, status:"● ปกติ"}
+      {img:"", name:"UPS1A", cap:"400 kVA / 400 kW", kw:101, status:"● ปกติ"},
+      {img:"", name:"UPS1B", cap:"400 kVA / 400 kW", kw:76, status:"● ปกติ"},
+      {img:"", name:"UPS1C", cap:"400 kVA / 400 kW", kw:106, status:"● ปกติ"},
+      {img:"", name:"UPS1D", cap:"400 kVA / 400 kW", kw:100, status:"● ปกติ"},
+      {img:"", name:"UPS2A", cap:"400 kVA / 400 kW", kw:85, status:"● ปกติ"},
+      {img:"", name:"UPS2B", cap:"400 kVA / 400 kW", kw:98, status:"● ปกติ"},
+      {img:"", name:"UPS2C", cap:"400 kVA / 400 kW", kw:88, status:"● ปกติ"},
+      {img:"", name:"UPS2D", cap:"400 kVA / 400 kW", kw:93, status:"● ปกติ"}
     ],
     ups: [
-      {loc:"Saraburi Phase 1 (อาคาร UT)", name:"UPS1A", brand:"SOCOMEC", model:"DELPHYS-GP 2.0", sn:"*************1", pm:"4 ครั้ง"},
-      {loc:"Saraburi Phase 1 (อาคาร UT)", name:"UPS1B", brand:"SOCOMEC", model:"DELPHYS-GP 2.0", sn:"*************1", pm:"4 ครั้ง"},
-      {loc:"Saraburi Phase 1 (อาคาร UT)", name:"UPS1C", brand:"SOCOMEC", model:"DELPHYS-GP 2.0", sn:"*************1", pm:"4 ครั้ง"},
-      {loc:"Saraburi Phase 1 (อาคาร UT)", name:"UPS1D", brand:"SOCOMEC", model:"DELPHYS-GP 2.0", sn:"*************1", pm:"4 ครั้ง"},
-      {loc:"Saraburi Phase 1 (อาคาร UT)", name:"UPS 30kVA-1", brand:"SOCOMEC", model:"MASTERYS-GP 2.0", sn:"P240382001", pm:"4 ครั้ง"},
-      {loc:"Saraburi Phase 1 (อาคาร UT)", name:"UPS 30kVA-2", brand:"SOCOMEC", model:"MASTERYS-GP 2.0", sn:"P238703001", pm:"4 ครั้ง"},
-      {loc:"Saraburi Phase 1 (อาคาร UT)", name:"UPS2A", brand:"SOCOMEC", model:"DELPHYS-GP 2.0", sn:"*************1", pm:"4 ครั้ง"},
-      {loc:"Saraburi Phase 1 (อาคาร UT)", name:"UPS2B", brand:"SOCOMEC", model:"DELPHYS-GP 2.0", sn:"*************1", pm:"4 ครั้ง"},
-      {loc:"Saraburi Phase 1 (อาคาร UT)", name:"UPS2C", brand:"SOCOMEC", model:"DELPHYS-GP 2.0", sn:"*************1", pm:"4 ครั้ง"},
-      {loc:"Saraburi Phase 1 (อาคาร UT)", name:"UPS2D", brand:"SOCOMEC", model:"DELPHYS-GP 2.0", sn:"*************1", pm:"4 ครั้ง"},
-      {loc:"Saraburi Office Shaft", name:"Office UPS", brand:"Cyber", model:"Cyber HSTP3T60KE", sn:"BBFFZ0000003", pm:"4 ครั้ง"}
+      {img:"", loc:"Saraburi Phase 1 (อาคาร UT)", name:"UPS1A", brand:"SOCOMEC", model:"DELPHYS-GP 2.0", sn:"16100385770001", pm:"4 ครั้ง"},
+      {img:"", loc:"Saraburi Phase 1 (อาคาร UT)", name:"UPS1B", brand:"SOCOMEC", model:"DELPHYS-GP 2.0", sn:"16100385981001", pm:"4 ครั้ง"},
+      {img:"", loc:"Saraburi Phase 1 (อาคาร UT)", name:"UPS1C", brand:"SOCOMEC", model:"DELPHYS-GP 2.0", sn:"16100385949001", pm:"4 ครั้ง"},
+      {img:"", loc:"Saraburi Phase 1 (อาคาร UT)", name:"UPS1D", brand:"SOCOMEC", model:"DELPHYS-GP 2.0", sn:"15100384100001", pm:"4 ครั้ง"},
+      {img:"", loc:"Saraburi Phase 1 (อาคาร UT)", name:"UPS 30kVA-1", brand:"SOCOMEC", model:"MASTERYS-GP 2.0", sn:"P240382001", pm:"4 ครั้ง"},
+      {img:"", loc:"Saraburi Phase 1 (อาคาร UT)", name:"UPS 30kVA-2", brand:"SOCOMEC", model:"MASTERYS-GP 2.0", sn:"P238703001", pm:"4 ครั้ง"},
+      {img:"", loc:"Saraburi Phase 1 (อาคาร UT)", name:"UPS2A", brand:"SOCOMEC", model:"DELPHYS-GP 2.0", sn:"15100384100001", pm:"4 ครั้ง"},
+      {img:"", loc:"Saraburi Phase 1 (อาคาร UT)", name:"UPS2B", brand:"SOCOMEC", model:"DELPHYS-GP 2.0", sn:"17100389790001", pm:"4 ครั้ง"},
+      {img:"", loc:"Saraburi Phase 1 (อาคาร UT)", name:"UPS2C", brand:"SOCOMEC", model:"DELPHYS-GP 2.0", sn:"17100389789001", pm:"4 ครั้ง"},
+      {img:"", loc:"Saraburi Phase 1 (อาคาร UT)", name:"UPS2D", brand:"SOCOMEC", model:"DELPHYS-GP 2.0", sn:"17100389788001", pm:"4 ครั้ง"},
+      {img:"", loc:"Saraburi Office Shaft", name:"Office UPS", brand:"Cyber", model:"Cyber HSTP3T60KE", sn:"BBFFZ0000003", pm:"4 ครั้ง"}
     ],
     battery: [
       {group:"Day 1: UPS-1A ถึง 1D (String 3)", qty:"42 ลูก/String (รวม 168 ลูก)", v1:"SNG", nc1:"NC-472", d1:"19-20/12/2563", d2:"19-20/12/2568", v2:"S Distribution", nc2:"NC-260130290"},
@@ -403,67 +439,71 @@
       {group:"Batt-UPS 60kVA (Office)", qty:"56Ah จำนวน 40 ลูก", v1:"SNG", nc1:"NC-377", d1:"15/08/2563", d2:"22/11/2573", v2:"S Distribution", nc2:"NC-2903"}
     ],
     spare: [
-      {sys:"UPS 400kVA (Day 1 & 2)", part:"FAN 220Vac 172x150 / 230V 1000M3/H", pos:"By-pass / Inverter", qty:"4 - 6 ตัว", freq:"ทุก 4 ปี", year:"2021, 2025, 2029, 2033, 2037"},
-      {sys:"UPS 400kVA (Day 1 & 2)", part:"Chemical DC Capacitor & Snubber 1µF", pos:"DC Bus / Rectifier / Boost", qty:"16 - 32 ลูก", freq:"ทุก 5 ปี", year:"2022, 2027, 2032, 2037"},
-      {sys:"UPS 400kVA (Day 1 & 2)", part:"Capacitor Polypo 200µF / 120µF", pos:"Inverter / Rectifier", qty:"6 - 24 ลูก", freq:"ทุก 5-7 ปี", year:"รอบเปลี่ยนตามแผนระยะยาว"},
-      {sys:"UPS 400kVA (Day 1 & 2)", part:"Power Supply / Universal Tropic PCB", pos:"Main Power Supply", qty:"4 - 8 บอร์ด", freq:"ทุก 10 ปี", year:"2024, 2028, 2038"},
-      {sys:"UPS 30kVA (Phase 1)", part:"FAN 24Vdc (119x38 & 80x25)", pos:"Internal Unit", qty:"3 ตัว", freq:"ทุก 4 ปี", year:"ตามรอบแผน 20 ปี"},
-      {sys:"UPS 30kVA (Phase 1)", part:"DC Capacitors & AC Cap-OP", pos:"Inverter / DC Bus", qty:"1 - 3 ลูก", freq:"ทุก 5-7 ปี", year:"ตามรอบแผน 20 ปี"},
-      {sys:"UPS 60kVA (Office)", part:"Cooling Fan Module & Power Module", pos:"Core Modules", qty:"1 - 4 ชุด", freq:"ทุก 5 ปี", year:"2023, 2028, 2033"}
+      {img:"", sys:"UPS 400kVA (Day 1 & 2)", part:"FAN 220Vac 172x150 / 230V 1000M3/H", pos:"By-pass / Inverter", qty:"4 - 6 ตัว", freq:"ทุก 4 ปี", year:"2021, 2025, 2029, 2033, 2037"},
+      {img:"", sys:"UPS 400kVA (Day 1 & 2)", part:"Chemical DC Capacitor & Snubber 1µF", pos:"DC Bus / Rectifier / Boost", qty:"16 - 32 ลูก", freq:"ทุก 5 ปี", year:"2022, 2027, 2032, 2037"},
+      {img:"", sys:"UPS 400kVA (Day 1 & 2)", part:"Capacitor Polypo 200µF / 120µF", pos:"Inverter / Rectifier", qty:"6 - 24 ลูก", freq:"ทุก 5-7 ปี", year:"รอบเปลี่ยนตามแผนระยะยาว"},
+      {img:"", sys:"UPS 400kVA (Day 1 & 2)", part:"Power Supply / Universal Tropic PCB", pos:"Main Power Supply", qty:"4 - 8 บอร์ด", freq:"ทุก 10 ปี", year:"2024, 2028, 2038"},
+      {img:"", sys:"UPS 30kVA (Phase 1)", part:"FAN 24Vdc (119x38 & 80x25)", pos:"Internal Unit", qty:"3 ตัว", freq:"ทุก 4 ปี", year:"ตามรอบแผน 20 ปี"},
+      {img:"", sys:"UPS 30kVA (Phase 1)", part:"DC Capacitors & AC Cap-OP", pos:"Inverter / DC Bus", qty:"1 - 3 ลูก", freq:"ทุก 5-7 ปี", year:"ตามรอบแผน 20 ปี"},
+      {img:"", sys:"UPS 60kVA (Office)", part:"Cooling Fan Module & Power Module", pos:"Core Modules", qty:"1 - 4 ชุด", freq:"ทุก 5 ปี", year:"2023, 2028, 2033"}
     ],
     nc: [
-      {no:"NC-260721899", date:"1-2/08/2569", type:"Normal - Minor Change", item:"UPS-1A..1D STRING 2", desc:"CCM-IDC3_ Normal change เปลี่ยนแบตเตอรี่ UPS String 2 Phase 1", pri:"Low / Planned (P5)"},
-      {no:"NC-260130290", date:"13-14/02/2026", type:"Normal - Minor Change", item:"UPS-1A..1D STRING 3", desc:"CCM-IDC3_ Normal change เปลี่ยนแบตเตอรี่ UPS String 3 Phase 1", pri:"Low / Planned (P5)"},
-      {no:"NC-2903", date:"14/11/2025", type:"Normal - Minor Change", item:"Office UPS", desc:"CCM-IDC3_ Normal Change_ เปลี่ยน Battery (UPS) ขนาด 60KVA อาคารสำนักงาน", pri:"Low / Planned (P5)"},
-      {no:"NC-2901", date:"14/11/2025", type:"Normal - Minor Change", item:"UPS1C", desc:"CCM-IDC3_ เปลี่ยน Card Modbus UPS-1C Phase1", pri:"Medium / Low (P4)"},
-      {no:"NC-2787", date:"24/09/2025", type:"Normal - Minor Change", item:"UPS 30kVA-1", desc:"CCM-IDC3_ Normal Change_เปลี่ยน Battery (UPS) 2เครื่อง ขนาด 30KVA", pri:"Low / Planned (P5)"},
-      {no:"NC-1906", date:"31/10/2024", type:"Normal - Minor Change", item:"UPS2A", desc:"CCM-IDC3_ เปลี่ยนแบตเตอรี่ UPS-2A String 2 #21 Phase 1", pri:"Low / Planned (P5)"},
-      {no:"NC-1836", date:"11/10/2024", type:"Normal - Minor Change", item:"UPS2A", desc:"CCM-IDC3_ เปลี่ยนแบตเตอรี่ UPS-2A String 2 #32 Phase 1", pri:"Low / Planned (P5)"},
-      {no:"NC-1528", date:"3/5/2024", type:"Normal - Minor Change", item:"UPS2A", desc:"CCM-IDC3_ Upgrade Firmware UPS 400KVA Phase1 Day2", pri:"Low / Planned (P5)"},
-      {no:"NC-1358", date:"10/11/2023", type:"Normal - Minor Change", item:"UPS2D", desc:"CCM-IDC3_ เปลี่ยน UPS String 1 Phase 1-2", pri:"Medium / Low (P4)"},
-      {no:"NC-1071", date:"10/2/2023", type:"Normal - Minor Change", item:"UPS1A", desc:"CCM-IDC3_ เปลี่ยน Battery UPS1A String1, UPS1B, 1C, 1D", pri:"Medium / Low (P4)"}
+      {img:"", no:"NC-260721899", date:"1-2/08/2569", type:"Normal - Minor Change", item:"UPS-1A..1D STRING 2", desc:"CCM-IDC3_ Normal change เปลี่ยนแบตเตอรี่ UPS String 2 Phase 1", pri:"Low / Planned (P5)"},
+      {img:"", no:"NC-260130290", date:"13-14/02/2026", type:"Normal - Minor Change", item:"UPS-1A..1D STRING 3", desc:"CCM-IDC3_ Normal change เปลี่ยนแบตเตอรี่ UPS String 3 Phase 1", pri:"Low / Planned (P5)"},
+      {img:"", no:"NC-2903", date:"14/11/2025", type:"Normal - Minor Change", item:"Office UPS", desc:"CCM-IDC3_ Normal Change_ เปลี่ยน Battery (UPS) ขนาด 60KVA อาคารสำนักงาน", pri:"Low / Planned (P5)"},
+      {img:"", no:"NC-2901", date:"14/11/2025", type:"Normal - Minor Change", item:"UPS1C", desc:"CCM-IDC3_ เปลี่ยน Card Modbus UPS-1C Phase1", pri:"Medium / Low (P4)"},
+      {img:"", no:"NC-2787", date:"24/09/2025", type:"Normal - Minor Change", item:"UPS 30kVA-1", desc:"CCM-IDC3_ Normal Change_เปลี่ยน Battery (UPS) 2เครื่อง ขนาด 30KVA", pri:"Low / Planned (P5)"},
+      {img:"", no:"NC-1906", date:"31/10/2024", type:"Normal - Minor Change", item:"UPS2A", desc:"CCM-IDC3_ เปลี่ยนแบตเตอรี่ UPS-2A String 2 #21 Phase 1", pri:"Low / Planned (P5)"},
+      {img:"", no:"NC-1836", date:"11/10/2024", type:"Normal - Minor Change", item:"UPS2A", desc:"CCM-IDC3_ เปลี่ยนแบตเตอรี่ UPS-2A String 2 #32 Phase 1", pri:"Low / Planned (P5)"},
+      {img:"", no:"NC-1528", date:"3/5/2024", type:"Normal - Minor Change", item:"UPS2A", desc:"CCM-IDC3_ Upgrade Firmware UPS 400KVA Phase1 Day2", pri:"Low / Planned (P5)"},
+      {img:"", no:"NC-1358", date:"10/11/2023", type:"Normal - Minor Change", item:"UPS2D", desc:"CCM-IDC3_ เปลี่ยน UPS String 1 Phase 1-2", pri:"Medium / Low (P4)"},
+      {img:"", no:"NC-1071", date:"10/2/2023", type:"Normal - Minor Change", item:"UPS1A", desc:"CCM-IDC3_ เปลี่ยน Battery UPS1A String1, UPS1B, 1C, 1D", pri:"Medium / Low (P4)"}
     ],
     ec: [
-      {no:"EC-260430869", date:"30/04/2026", time:"21:30 PM", item:"UPS1D", desc:"CCM-IDC3_ Emergency Change เปลี่ยน ชุด Borad Control UPS 1D วันที่ : 30/04/2569", impact:"Medium / Low P4"},
-      {no:"EC-26070382", date:"03/07/2026", time:"10:00 AM", item:"CRAH-1-16", desc:"CCM-IDC3_ Emergency Change เปลี่ยน Controller Display New Version CRAH-16 อาคาร DC Hall Phase 1 วันที่ 03/07/2569", impact:"Low / Low P5"},
-      {no:"EC-260701452", date:"01/07/2026", time:"14:30 PM", item:"UPS-1A2 STRING 1", desc:"CCM-IDC3_ Emergency Change เปลี่ยนแบตเตอรี่ UPS 1A2-STR1 ลูกที่40 Phase 2 วันที่ 01/07/2569", impact:"Medium / Low P4"},
-      {no:"EC-260626488", date:"26/06/2026", time:"15:20 PM", item:"UPS1C UPS1D", desc:"CCM-IDC3_ Emergency Change เปลี่ยน ชุด Borad Control UPS 1C และ 1D วันที่ 26/06/2569", impact:"Medium / Low P4"},
-      {no:"EC-26060248", date:"02/06/2026", time:"10:00 AM", item:"UPS2C", desc:"CCM-IDC3_Emergency change เปลี่ยนแบตเตอรี่ UPS-2C String 3 #11 Phase 1 วันที่ 02/06/2569", impact:"Low / Low P5"},
-      {no:"EC-849", date:"18/10/2024", time:"14:24", item:"UPS2B", desc:"CCM-IDC3_ Emergency Change เปลี่ยนแบตเตอรี่ UPS 2B2-STR1 ลูกที่ 3", impact:"Low / Low"},
-      {no:"EC-772", date:"17/07/2024", time:"14:10", item:"UPS2A", desc:"CCM-IDC3_Emergency change เปลี่ยนแบตเตอรี่ UPS-2A String 2 #32 Phase 1", impact:"Low / Low"},
-      {no:"EC-743", date:"9/5/2024", time:"19:05", item:"UPS1A", desc:"CCM-IDC3_ Emergency Change เปลี่ยน ชุด Magnetic KM 10 UPS 1A", impact:"Medium / Low"},
-      {no:"EC-719", date:"4/3/2024", time:"14:50", item:"UPS1B", desc:"CCM-IDC3_ Emergency Change เปลี่ยน ชุด Borad Bypass UPS 1B", impact:"Medium / Low"},
-      {no:"EC-541", date:"28/03/2023", time:"08:43", item:"Office UPS", desc:"CCM-IDC3_Emergency change เปลี่ยน แบตเตอรี่ UPS 60Kva อาคาร Office", impact:"Low / Low"},
-      {no:"EC-519", date:"13/02/2023", time:"09:14", item:"UPS1B", desc:"CCM-IDC3_Emergency change เปลี่ยนแบตเตอรี่ลูก 1B2 STR-2 ลูกที่22", impact:"Low / Low"},
-      {no:"EC-518", date:"10/2/2023", time:"13:25", item:"UPS1C", desc:"CCM-IDC3_ Emergency change Upgrade Firmware UPS-1C เพื่อแก้ปัญหา", impact:"Medium / Medium"},
-      {no:"EC-497", date:"21/12/2022", time:"12:21", item:"UPS1A", desc:"CCM-IDC3_Emergency change เปลี่ยนแบตเตอรี่ลูก 1A1 STR-3 ลูกที่23 อาคารUT2 Phase2", impact:"Low / Low"},
-      {no:"EC-328", date:"28/10/2021", time:"10:10", item:"Office UPS", desc:"CCM-IDC3_ Emergency Change เปลี่ยน Power moduleพัดลม (UPS) ขนาด 60KVA", impact:"Low / Low"}
+      {img:"", no:"EC-260430869", date:"30/04/2026", time:"21:30 PM", item:"UPS1D", desc:"CCM-IDC3_ Emergency Change เปลี่ยน ชุด Borad Control UPS 1D วันที่ : 30/04/2569", impact:"Medium / Low P4"},
+      {img:"", no:"EC-26070382", date:"03/07/2026", time:"10:00 AM", item:"CRAH-1-16", desc:"CCM-IDC3_ Emergency Change เปลี่ยน Controller Display New Version CRAH-16 อาคาร DC Hall Phase 1 วันที่ 03/07/2569", impact:"Low / Low P5"},
+      {img:"", no:"EC-260701452", date:"01/07/2026", time:"14:30 PM", item:"UPS-1A2 STRING 1", desc:"CCM-IDC3_ Emergency Change เปลี่ยนแบตเตอรี่ UPS 1A2-STR1 ลูกที่40 Phase 2 วันที่ 01/07/2569", impact:"Medium / Low P4"},
+      {img:"", no:"EC-260626488", date:"26/06/2026", time:"15:20 PM", item:"UPS1C UPS1D", desc:"CCM-IDC3_ Emergency Change เปลี่ยน ชุด Borad Control UPS 1C และ 1D วันที่ 26/06/2569", impact:"Medium / Low P4"},
+      {img:"", no:"EC-26060248", date:"02/06/2026", time:"10:00 AM", item:"UPS2C", desc:"CCM-IDC3_Emergency change เปลี่ยนแบตเตอรี่ UPS-2C String 3 #11 Phase 1 วันที่ 02/06/2569", impact:"Low / Low P5"},
+      {img:"", no:"EC-849", date:"18/10/2024", time:"14:24", item:"UPS2B", desc:"CCM-IDC3_ Emergency Change เปลี่ยนแบตเตอรี่ UPS 2B2-STR1 ลูกที่ 3", impact:"Low / Low"},
+      {img:"", no:"EC-772", date:"17/07/2024", time:"14:10", item:"UPS2A", desc:"CCM-IDC3_Emergency change เปลี่ยนแบตเตอรี่ UPS-2A String 2 #32 Phase 1", impact:"Low / Low"},
+      {img:"", no:"EC-743", date:"9/5/2024", time:"19:05", item:"UPS1A", desc:"CCM-IDC3_ Emergency Change เปลี่ยน ชุด Magnetic KM 10 UPS 1A", impact:"Medium / Low"},
+      {img:"", no:"EC-719", date:"4/3/2024", time:"14:50", item:"UPS1B", desc:"CCM-IDC3_ Emergency Change เปลี่ยน ชุด Borad Bypass UPS 1B", impact:"Medium / Low"},
+      {img:"", no:"EC-541", date:"28/03/2023", time:"08:43", item:"Office UPS", desc:"CCM-IDC3_Emergency change เปลี่ยน แบตเตอรี่ UPS 60Kva อาคาร Office", impact:"Low / Low"},
+      {img:"", no:"EC-519", date:"13/02/2023", time:"09:14", item:"UPS1B", desc:"CCM-IDC3_Emergency change เปลี่ยนแบตเตอรี่ลูก 1B2 STR-2 ลูกที่22", impact:"Low / Low"},
+      {img:"", no:"EC-518", date:"10/2/2023", time:"13:25", item:"UPS1C", desc:"CCM-IDC3_ Emergency change Upgrade Firmware UPS-1C เพื่อแก้ปัญหา", impact:"Medium / Medium"},
+      {img:"", no:"EC-497", date:"21/12/2022", time:"12:21", item:"UPS1A", desc:"CCM-IDC3_Emergency change เปลี่ยนแบตเตอรี่ลูก 1A1 STR-3 ลูกที่23 อาคารUT2 Phase2", impact:"Low / Low"},
+      {img:"", no:"EC-328", date:"28/10/2021", time:"10:10", item:"Office UPS", desc:"CCM-IDC3_ Emergency Change เปลี่ยน Power moduleพัดลม (UPS) ขนาด 60KVA", impact:"Low / Low"}
     ],
     po25: [
-      {num:"1", date:"23/07/2568", po:"PO07-2025070032", item:"เปลี่ยนแบตเตอรี่ Strang3 UPS1A,B,C,D", ship:"180-210 วัน", prog:"13-14/02/2569", install:"13-14/02/2569", note:"ดำเนินการเปลี่ยนเสร็จเรียบร้อย"},
-      {num:"2", date:"24/07/2568", po:"PO07-2025070036", item:"เปลี่ยนแบตเตอรี่ UPS30Kva", ship:"90-120 วัน", prog:"6/10/2568", install:"6/10/2568", note:"Vendor SD เข้าเปลี่ยนแบตเตอรี่ 30kVA 144 ลูก เรียบร้อย"},
-      {num:"3", date:"24/07/2568", po:"PO07-2025070033", item:"เปลี่ยนแบตเตอรี่ UPS60Kva", ship:"120-150 วัน", prog:"22/11/2569", install:"22/11/2569", note:"ตามแผนงานอาคารสำนักงาน"}
+      {img:"", num:"1", date:"23/07/2568", po:"PO07-2025070032", item:"เปลี่ยนแบตเตอรี่ Strang3 UPS1A,B,C,D", ship:"180-210 วัน", prog:"13-14/02/2569", install:"13-14/02/2569", note:"ดำเนินการเปลี่ยนเสร็จเรียบร้อย"},
+      {img:"", num:"2", date:"24/07/2568", po:"PO07-2025070036", item:"เปลี่ยนแบตเตอรี่ UPS30Kva", ship:"90-120 วัน", prog:"6/10/2568", install:"6/10/2568", note:"Vendor SD เข้าเปลี่ยนแบตเตอรี่ 30kVA 144 ลูก เรียบร้อย"},
+      {img:"", num:"3", date:"24/07/2568", po:"PO07-2025070033", item:"เปลี่ยนแบตเตอรี่ UPS60Kva", ship:"120-150 วัน", prog:"22/11/2569", install:"22/11/2569", note:"ตามแผนงานอาคารสำนักงาน"}
     ],
     po26: [
-      {num:"1", date:"25/02/2569", po:"P007-INET260200011", item:"Battery Replacement Butterfly Bldg 2 - Fiamm 12FIT201 (12V 195Ah) Warranty 5 yrs", ship:"180-210 วัน", prog:"Wait Update", install:"Wait Update", note:"สินค้าสั่งผลิตพิเศษ (By order)"},
-      {num:"2", date:"26/02/268", po:"P007-INET260200016", item:"Battery Replacement 336 EA - Fiamm Model 12FLB400P (12V 105AH) for 8x 400kVA UPS Day1-Day2", ship:"180-210 วัน", prog:"Update 21/04/2569", install:"Wait Update", note:"สินค้าอยู่ระหว่างขนส่งทางเรือ มาถึงไทยประมาณมิถุนายน 2569 ติดตั้ง ต.ค. 2569"}
+      {img:"", num:"1", date:"25/02/269", po:"P007-INET260200011", item:"Battery Replacement Butterfly Bldg 2 - Fiamm 12FIT201 (12V 195Ah) Warranty 5 yrs", ship:"180-210 วัน", prog:"Wait Update", install:"Wait Update", note:"สินค้าสั่งผลิตพิเศษ (By order)"},
+      {img:"", num:"2", date:"26/02/268", po:"P007-INET260200016", item:"Battery Replacement 336 EA - Fiamm Model 12FLB400P (12V 105AH) for 8x 400kVA UPS Day1-Day2", ship:"180-210 วัน", prog:"Update 21/04/2569", install:"Wait Update", note:"สินค้าอยู่ระหว่างขนส่งทางเรือ มาถึงไทยประมาณมิถุนายน 2569 ติดตั้ง ต.ค. 2569"}
     ],
     air: [
-      {phase:"แอร์เฟส 1", brand:"Emerson Network Power", model:"P2070DC1N2HL12L1A07ACE000 (P/N: F0119200 / INET)", sn:"21F0119200217B010002", tech:"ควบคุมอุณหภูมิและความชื้นแม่นยำสูง", date:"13/11/2017"},
-      {phase:"แอร์เฟส 2", brand:"Vertiv / Liebert", model:"P3180DC1N20L02L1A07ACE0XX (Site ID: DC2 / Tag: 07)", sn:"21F01206542186020003", tech:"Power: 380-415V, FL: 12.9A, Max Press: 1.6 MPa, Wt: 810/970 kg", date:"ปี 2021"}
+      {img:"", phase:"แอร์เฟส 1", brand:"Emerson Network Power", model:"P2070DC1N2HL12L1A07ACE000 (P/N: F0119200 / INET)", sn:"21F0119200217B010002", tech:"ควบคุมอุณหภูมิและความชื้นแม่นยำสูง", date:"13/11/2017"},
+      {img:"", phase:"แอร์เฟส 2", brand:"Vertiv / Liebert", model:"P3180DC1N20L02L1A07ACE0XX (Site ID: DC2 / Tag: 07)", sn:"21F0xxxxxxxxxxxx003", tech:"Power: 380-415V, FL: 12.9A, Max Press: 1.6 MPa, Wt: 810/970 kg", date:"ปี 2021"}
     ],
     vendor: [
-      {system:"CRAH & Water Leak", site:"SRB Phase 1-2 (62 Unit)", vendor:"Vertiv", contact:"Call Center / ชาตรี / วรชัย", phone:"02-xxx-xxxx", pmDate:"Q1: มี.ค., Q2: มิ.ย., Q3: ก.ย., Q4: ธ.ค.", email:"support@vertiv.com"},
-      {system:"UPS 400kVA & 30kVA", site:"SRB Phase 1", vendor:"Socomec", contact:"Hotline / กนก บัวกอ / อัครวินท์", phone:"02-xxx-xxxx", pmDate:"ทุกๆ 3 เดือน (รอบ ก.พ., พ.ค., ส.ค., พ.ย.)", email:"support@socomec.com"},
-      {system:"UPS 60kVA (Office)", site:"SRB Office Shaft", vendor:"MAXI / ดีอาร์เค", contact:"ทนงศักดิ์ / อัศนีย์ / ณัฐพงศ์", phone:"02-xxx-xxxx", pmDate:"ทุกๆ 6 เดือน (รอบ เม.ย., ต.ค.)", email:"support@maxi.co.th"}
+      {img:"", system:"CRAH & Water Leak", site:"SRB Phase 1-2 (62 Unit)", vendor:"Vertiv", contact:"Call Center / ชาตรี / วรชัย", phone:"02-xxx-xxxx", pmDate:"Q1: มี.ค., Q2: มิ.ย., Q3: ก.ย., Q4: ธ.ค.", email:"support@vertiv.com"},
+      {img:"", system:"UPS 400kVA & 30kVA", site:"SRB Phase 1", vendor:"Socomec", contact:"Hotline / กนก บัวกอ / อัครวินท์", phone:"02-xxx-xxxx", pmDate:"ทุกๆ 3 เดือน (รอบ ก.พ., พ.ค., ส.ค., พ.ย.)", email:"support@socomec.com"},
+      {img:"", system:"UPS 60kVA (Office)", site:"SRB Office Shaft", vendor:"MAXI / ดีอาร์เค", contact:"ทนงศักดิ์ / อัศนีย์ / ณัฐพงศ์", phone:"02-xxx-xxxx", pmDate:"ทุกๆ 6 เดือน (รอบ เม.ย., ต.ค.)", email:"support@maxi.co.th"}
     ]
   };
 
-  let db = JSON.parse(localStorage.getItem('idc3_master_db_v15')) || defaultData;
+  let db = JSON.parse(localStorage.getItem('idc3_master_db_v18')) || defaultData;
   let currentEditTable = '', currentEditIndex = -1;
 
   function saveData() {
-    localStorage.setItem('idc3_master_db_v15', JSON.stringify(db));
+    try {
+      localStorage.setItem('idc3_master_db_v18', JSON.stringify(db));
+    } catch(e) {
+      alert('พื้นที่จัดเก็บเต็ม! รูปภาพที่อัปโหลดมีขนาดใหญ่เกินไป\nแนะนำให้ใช้ลิงก์ URL รูปภาพแทนการอัปโหลดไฟล์ครับ');
+    }
     renderAll();
   }
 
@@ -473,10 +513,10 @@
     let avgPercent = (totalKw / (db.load.length * 400)) * 100;
 
     document.getElementById('cards-summary').innerHTML = `
-      <div class="card"><div class="label">Total UPS Units</div><div class="value">11 <span class="unit">ยูนิต</span></div></div>
-      <div class="card"><div class="label">CRAH Total Units</div><div class="value">62 <span class="unit">เครื่อง</span></div></div>
-      <div class="card"><div class="label">Total IT Load (Calculated)</div><div class="value">${totalKw.toFixed(1)} <span class="unit">kW</span></div></div>
-      <div class="card"><div class="label">สถานะแจ้งเตือนวิกฤต</div><div class="value" style="color:var(--ok)">0 <span class="unit">ระบบ</span></div></div>
+      <div class="card"><div class="label">Total UPS Units</div><div class="value">11 ยูนิต</div></div>
+      <div class="card"><div class="label">CRAH Total Units</div><div class="value">62 เครื่อง</div></div>
+      <div class="card"><div class="label">Total IT Load (Calculated)</div><div class="value">${totalKw.toFixed(1)} kW</div></div>
+      <div class="card"><div class="label">สถานะแจ้งเตือนวิกฤต</div><div class="value" style="color:var(--ok)">0 ระบบ</div></div>
     `;
 
     document.getElementById('cards-impedance').innerHTML = db.impedance.map((item, i) => `
@@ -492,41 +532,33 @@
 
     const bh = db.batteryHeaders;
     document.getElementById('tbl-battery-headers').innerHTML = `
-      <th>${bh.h1}</th>
-      <th>${bh.h2}</th>
-      <th>${bh.h3}</th>
-      <th>${bh.h4}</th>
-      <th>${bh.h5}</th>
-      <th>${bh.h6}</th>
-      <th>${bh.h7}</th>
-      <th>${bh.h8}</th>
-      <th>จัดการ</th>
+      <th>${bh.h1}</th><th>${bh.h2}</th><th>${bh.h3}</th><th>${bh.h4}</th>
+      <th>${bh.h5}</th><th>${bh.h6}</th><th>${bh.h7}</th><th>${bh.h8}</th><th>จัดการ</th>
     `;
 
-    document.getElementById('tbl-load').innerHTML = db.load.map((item, i) => {
-      let percent = ((item.kw / 400) * 100).toFixed(2);
-      return `
-        <tr>
-          <td><b>${item.name}</b></td>
-          <td>${item.cap}</td>
-          <td><b style="color:var(--primary)">${item.kw} kW</b></td>
-          <td><b>${percent}%</b></td>
-          <td><span style="color:var(--ok)">${item.status}</span></td>
-          <td><button class="btn btn-sm" onclick="openEditModal('load', ${i})">แก้ไข</button> <button class="btn btn-sm btn-danger" onclick="deleteRow('load', ${i})">ลบ</button></td>
-        </tr>
-      `;
-    }).join('') + `
+    document.getElementById('tbl-load').innerHTML = db.load.map((item, i) => `
+      <tr>
+        <td>${imgCell(item.img)}</td>
+        <td><b>${item.name}</b></td>
+        <td>${item.cap}</td>
+        <td><b style="color:var(--primary)">${item.kw} kW</b></td>
+        <td><b>${((item.kw / 400) * 100).toFixed(2)}%</b></td>
+        <td><span style="color:var(--ok)">${item.status}</span></td>
+        <td><button class="btn btn-sm" onclick="openEditModal('load', ${i})">แก้ไข</button> <button class="btn btn-sm btn-danger" onclick="deleteRow('load', ${i})">ลบ</button></td>
+      </tr>
+    `).join('') + `
       <tr style="background:#f7fafc">
+        <td>-</td>
         <td><b>รวมทั้งหมด (${db.load.length} เครื่อง)</b></td>
         <td><b>${db.load.length * 400} kW</b></td>
-        <td><b style="color:var(--crit); font-size:14px">${totalKw} kW</b></td>
+        <td><b style="color:var(--crit);font-size:14px">${totalKw} kW</b></td>
         <td><b style="color:var(--primary)">${avgPercent.toFixed(2)}% (เฉลี่ย)</b></td>
         <td colspan="2"><i>ระบบทำงานปกติ</i></td>
-      </tr>
-    `;
+      </tr>`;
 
     document.getElementById('tbl-ups').innerHTML = db.ups.map((u, i) => `
       <tr>
+        <td>${imgCell(u.img)}</td>
         <td>${u.loc}</td>
         <td><span class="ups-link" onclick="showUpsDetail('${u.name}')">${u.name}</span></td>
         <td>${u.brand}</td><td>${u.model}</td><td>${u.sn}</td><td>${u.pm}</td>
@@ -536,23 +568,15 @@
 
     document.getElementById('tbl-battery').innerHTML = db.battery.map((b, i) => `
       <tr>
-        <td><b>${b.group}</b></td>
-        <td>${b.qty}</td>
-        <td>${b.v1}</td>
-        <td>${b.nc1}</td>
-        <td>${b.d1}</td>
-        <td><b>${b.d2}</b></td>
-        <td>${b.v2}</td>
-        <td>${b.nc2}</td>
-        <td>
-          <button class="btn btn-sm" onclick="openEditModal('battery', ${i})">แก้ไข</button>
-          <button class="btn btn-sm btn-danger" onclick="deleteRow('battery', ${i})">ลบ</button>
-        </td>
+        <td><b>${b.group}</b></td><td>${b.qty}</td><td>${b.v1}</td><td>${b.nc1}</td>
+        <td>${b.d1}</td><td><b>${b.d2}</b></td><td>${b.v2}</td><td>${b.nc2}</td>
+        <td><button class="btn btn-sm" onclick="openEditModal('battery', ${i})">แก้ไข</button> <button class="btn btn-sm btn-danger" onclick="deleteRow('battery', ${i})">ลบ</button></td>
       </tr>
     `).join('');
 
     document.getElementById('tbl-spare').innerHTML = db.spare.map((s, i) => `
       <tr>
+        <td>${imgCell(s.img)}</td>
         <td><span class="ups-link" onclick="showSpareDetail('${s.sys}')">${s.sys}</span></td>
         <td>${s.part}</td><td>${s.pos}</td><td>${s.qty}</td><td>${s.freq}</td><td>${s.year}</td>
         <td><button class="btn btn-sm" onclick="openEditModal('spare', ${i})">แก้ไข</button> <button class="btn btn-sm btn-danger" onclick="deleteRow('spare', ${i})">ลบ</button></td>
@@ -560,44 +584,52 @@
     `).join('');
 
     document.getElementById('tbl-nc').innerHTML = db.nc.map((n, i) => `
-      <tr><td><b>${n.no}</b></td><td>${n.date}</td><td>${n.type}</td><td>${n.item}</td><td>${n.desc}</td><td>${n.pri}</td>
-      <td><button class="btn btn-sm" onclick="openEditModal('nc', ${i})">แก้ไข</button> <button class="btn btn-sm btn-danger" onclick="deleteRow('nc', ${i})">ลบ</button></td></tr>
+      <tr>
+        <td>${imgCell(n.img)}</td>
+        <td><b>${n.no}</b></td><td>${n.date}</td><td>${n.type}</td><td>${n.item}</td><td>${n.desc}</td><td>${n.pri}</td>
+        <td><button class="btn btn-sm" onclick="openEditModal('nc', ${i})">แก้ไข</button> <button class="btn btn-sm btn-danger" onclick="deleteRow('nc', ${i})">ลบ</button></td>
+      </tr>
     `).join('');
 
     document.getElementById('tbl-ec').innerHTML = db.ec.map((e, i) => `
-      <tr><td><b>${e.no}</b></td><td>${e.date}</td><td>${e.time}</td><td>${e.item}</td><td>${e.desc}</td><td>${e.impact}</td>
-      <td><button class="btn btn-sm" onclick="openEditModal('ec', ${i})">แก้ไข</button> <button class="btn btn-sm btn-danger" onclick="deleteRow('ec', ${i})">ลบ</button></td></tr>
+      <tr>
+        <td>${imgCell(e.img)}</td>
+        <td><b>${e.no}</b></td><td>${e.date}</td><td>${e.time}</td><td>${e.item}</td><td>${e.desc}</td><td>${e.impact}</td>
+        <td><button class="btn btn-sm" onclick="openEditModal('ec', ${i})">แก้ไข</button> <button class="btn btn-sm btn-danger" onclick="deleteRow('ec', ${i})">ลบ</button></td>
+      </tr>
     `).join('');
 
     document.getElementById('tbl-vendor').innerHTML = db.vendor.map((v, i) => `
       <tr>
-        <td><b>${v.system}</b></td>
-        <td>${v.site}</td>
-        <td>${v.vendor}</td>
-        <td>${v.contact}</td>
-        <td>${v.phone}</td>
-        <td><b style="color:var(--primary)">${v.pmDate || '-'}</b></td>
-        <td>${v.email}</td>
-        <td>
-          <button class="btn btn-sm" onclick="openEditModal('vendor', ${i})">แก้ไข</button>
-          <button class="btn btn-sm btn-danger" onclick="deleteRow('vendor', ${i})">ลบ</button>
-        </td>
+        <td>${imgCell(v.img)}</td>
+        <td><b>${v.system}</b></td><td>${v.site}</td><td>${v.vendor}</td><td>${v.contact}</td><td>${v.phone}</td>
+        <td><b style="color:var(--primary)">${v.pmDate || '-'}</b></td><td>${v.email}</td>
+        <td><button class="btn btn-sm" onclick="openEditModal('vendor', ${i})">แก้ไข</button> <button class="btn btn-sm btn-danger" onclick="deleteRow('vendor', ${i})">ลบ</button></td>
       </tr>
     `).join('');
 
     document.getElementById('tbl-po25').innerHTML = db.po25.map((p, i) => `
-      <tr><td>${p.num}</td><td>${p.date}</td><td><b>${p.po}</b></td><td>${p.item}</td><td>${p.ship}</td><td>${p.prog}</td><td>${p.install}</td><td>${p.note}</td>
-      <td><button class="btn btn-sm" onclick="openEditModal('po25', ${i})">แก้ไข</button> <button class="btn btn-sm btn-danger" onclick="deleteRow('po25', ${i})">ลบ</button></td></tr>
+      <tr>
+        <td>${imgCell(p.img)}</td>
+        <td>${p.num}</td><td>${p.date}</td><td><b>${p.po}</b></td><td>${p.item}</td><td>${p.ship}</td><td>${p.prog}</td><td>${p.install}</td><td>${p.note}</td>
+        <td><button class="btn btn-sm" onclick="openEditModal('po25', ${i})">แก้ไข</button> <button class="btn btn-sm btn-danger" onclick="deleteRow('po25', ${i})">ลบ</button></td>
+      </tr>
     `).join('');
 
     document.getElementById('tbl-po26').innerHTML = db.po26.map((p, i) => `
-      <tr><td>${p.num}</td><td>${p.date}</td><td><b>${p.po}</b></td><td>${p.item}</td><td>${p.ship}</td><td>${p.prog}</td><td>${p.install}</td><td>${p.note}</td>
-      <td><button class="btn btn-sm" onclick="openEditModal('po26', ${i})">แก้ไข</button> <button class="btn btn-sm btn-danger" onclick="deleteRow('po26', ${i})">ลบ</button></td></tr>
+      <tr>
+        <td>${imgCell(p.img)}</td>
+        <td>${p.num}</td><td>${p.date}</td><td><b>${p.po}</b></td><td>${p.item}</td><td>${p.ship}</td><td>${p.prog}</td><td>${p.install}</td><td>${p.note}</td>
+        <td><button class="btn btn-sm" onclick="openEditModal('po26', ${i})">แก้ไข</button> <button class="btn btn-sm btn-danger" onclick="deleteRow('po26', ${i})">ลบ</button></td>
+      </tr>
     `).join('');
 
     document.getElementById('tbl-air').innerHTML = db.air.map((a, i) => `
-      <tr><td><b>${a.phase}</b></td><td>${a.brand}</td><td>${a.model}</td><td>${a.sn}</td><td>${a.tech}</td><td>${a.date}</td>
-      <td><button class="btn btn-sm" onclick="openEditModal('air', ${i})">แก้ไข</button> <button class="btn btn-sm btn-danger" onclick="deleteRow('air', ${i})">ลบ</button></td></tr>
+      <tr>
+        <td>${imgCell(a.img)}</td>
+        <td><b>${a.phase}</b></td><td>${a.brand}</td><td>${a.model}</td><td>${a.sn}</td><td>${a.tech}</td><td>${a.date}</td>
+        <td><button class="btn btn-sm" onclick="openEditModal('air', ${i})">แก้ไข</button> <button class="btn btn-sm btn-danger" onclick="deleteRow('air', ${i})">ลบ</button></td>
+      </tr>
     `).join('');
 
     updateLoadChart();
@@ -606,15 +638,11 @@
   function updateLoadChart() {
     const ctxLoad = document.getElementById('loadChart').getContext('2d');
     if(loadChartInstance) loadChartInstance.destroy();
-    
-    let labels = db.load.map(x => x.name);
-    let dataVals = db.load.map(x => x.kw);
-
     loadChartInstance = new Chart(ctxLoad, {
       type: 'bar',
       data: {
-        labels: labels,
-        datasets: [{ label: 'โหลดปัจจุบัน (kW)', data: dataVals, backgroundColor: '#3182ce' }]
+        labels: db.load.map(x => x.name),
+        datasets: [{ label: 'โหลดปัจจุบัน (kW)', data: db.load.map(x => x.kw), backgroundColor: '#3182ce' }]
       },
       options: { responsive: true, maintainAspectRatio: false }
     });
@@ -627,18 +655,19 @@
 
     document.getElementById('detailTitle').textContent = `📄 ประวัติการซ่อมและบำรุงรักษา: ${upsName} (${upsInfo.brand || ''} ${upsInfo.model || ''})`;
 
-    let html = `
+    let html = '';
+    if(upsInfo.img){
+      html += `<div style="text-align:center;margin-bottom:14px"><img src="${upsInfo.img}" style="max-height:220px;border-radius:8px;border:1px solid var(--border);cursor:pointer" onclick="showImgViewer(this.src)"></div>`;
+    }
+    html += `
       <div style="background:#f7fafc;padding:12px;border-radius:8px;margin-bottom:16px;font-size:13px">
         <b>สถานที่:</b> ${upsInfo.loc || '-'} | <b>Serial Number:</b> ${upsInfo.sn || '-'} | <b>รอบ PM:</b> ${upsInfo.pm || '-'}
       </div>
-      <h4 style="color:#2b6cb0;margin-bottom:8px;font-size:14px">📋 ประวัติใบงานปกติ (Normal Change / NC)</h4>
-    `;
+      <h4 style="color:#2b6cb0;margin-bottom:8px;font-size:14px">📋 ประวัติใบงานปกติ (Normal Change / NC)</h4>`;
 
     if(matchedNc.length > 0) {
-      html += `<table style="margin-bottom:16px"><thead><tr><th>Ticket</th><th>วันที่</th><th>รายละเอียด</th></tr></thead><tbody>`;
-      matchedNc.forEach(n => {
-        html += `<tr><td><b>${n.no}</b></td><td>${n.date}</td><td>${n.desc}</td></tr>`;
-      });
+      html += `<table style="margin-bottom:16px"><thead><tr><th>รูป</th><th>Ticket</th><th>วันที่</th><th>รายละเอียด</th></tr></thead><tbody>`;
+      matchedNc.forEach(n => { html += `<tr><td>${imgCell(n.img)}</td><td><b>${n.no}</b></td><td>${n.date}</td><td>${n.desc}</td></tr>`; });
       html += `</tbody></table>`;
     } else {
       html += `<p style="color:var(--muted);font-size:13px;margin-bottom:16px"><i>ไม่พบประวัติ Normal Change ของอุปกรณ์นี้</i></p>`;
@@ -646,10 +675,8 @@
 
     html += `<h4 style="color:var(--crit);margin-bottom:8px;font-size:14px">🚨 ประวัติใบงานฉุกเฉิน (Emergency Change / EC)</h4>`;
     if(matchedEc.length > 0) {
-      html += `<table><thead><tr><th>Ticket</th><th>วันที่/เวลา</th><th>รายละเอียด</th></tr></thead><tbody>`;
-      matchedEc.forEach(e => {
-        html += `<tr><td><b>${e.no}</b></td><td>${e.date} ${e.time}</td><td>${e.desc}</td></tr>`;
-      });
+      html += `<table><thead><tr><th>รูป</th><th>Ticket</th><th>วันที่/เวลา</th><th>รายละเอียด</th></tr></thead><tbody>`;
+      matchedEc.forEach(e => { html += `<tr><td>${imgCell(e.img)}</td><td><b>${e.no}</b></td><td>${e.date} ${e.time}</td><td>${e.desc}</td></tr>`; });
       html += `</tbody></table>`;
     } else {
       html += `<p style="color:var(--muted);font-size:13px"><i>ไม่พบประวัติ Emergency Change ของอุปกรณ์นี้</i></p>`;
@@ -662,30 +689,45 @@
   function showSpareDetail(sysName) {
     const matchedParts = db.spare.filter(s => s.sys.includes(sysName));
     document.getElementById('detailTitle').textContent = `⚙️ รายละเอียดชิ้นส่วนและแผนรอบเปลี่ยนอะไหล่: ${sysName}`;
-
     let html = `
       <div style="background:#f7fafc;padding:12px;border-radius:8px;margin-bottom:16px;font-size:13px">
         <b>หมวดหมู่อุปกรณ์:</b> ${sysName} | <b>แผนอายุการใช้งาน:</b> 20 Years Lifecycle Planning
       </div>
-      <h4 style="color:#2b6cb0;margin-bottom:8px;font-size:14px">🔧 รายการ Spare Parts ทั้งหมดตามแผน</h4>
-    `;
-
+      <h4 style="color:#2b6cb0;margin-bottom:8px;font-size:14px">🔧 รายการ Spare Parts ทั้งหมดตามแผน</h4>`;
     if(matchedParts.length > 0) {
-      html += `<table><thead><tr><th>รายการอะไหล่</th><th>ตำแหน่งติดตั้ง</th><th>จำนวน</th><th>รอบเปลี่ยน</th><th>ปีรอบหลัก</th></tr></thead><tbody>`;
-      matchedParts.forEach(p => {
-        html += `<tr><td><b>${p.part}</b></td><td>${p.pos}</td><td>${p.qty}</td><td>${p.freq}</td><td>${p.year}</td></tr>`;
-      });
+      html += `<table><thead><tr><th>รูป</th><th>รายการอะไหล่</th><th>ตำแหน่งติดตั้ง</th><th>จำนวน</th><th>รอบเปลี่ยน</th><th>ปีรอบหลัก</th></tr></thead><tbody>`;
+      matchedParts.forEach(p => { html += `<tr><td>${imgCell(p.img)}</td><td><b>${p.part}</b></td><td>${p.pos}</td><td>${p.qty}</td><td>${p.freq}</td><td>${p.year}</td></tr>`; });
       html += `</tbody></table>`;
     } else {
       html += `<p style="color:var(--muted);font-size:13px"><i>ไม่พบข้อมูลอะไหล่ของระบบนี้</i></p>`;
     }
-
     document.getElementById('detailContent').innerHTML = html;
     document.getElementById('detailModal').style.display = 'flex';
   }
 
-  function closeDetailModal() {
-    document.getElementById('detailModal').style.display = 'none';
+  function closeDetailModal(){ document.getElementById('detailModal').style.display = 'none'; }
+
+  /* ---------- FORM BUILDER ---------- */
+  function buildField(key, value){
+    if(key === 'img'){
+      const v = value ? value.replace(/"/g,'&quot;') : '';
+      return `
+        <div class="form-group">
+          <label>รูปภาพ (IMG)</label>
+          <input type="text" id="m-img" value="${v}" placeholder="วางลิงก์รูป หรืออัปโหลดจากเครื่องด้านล่าง">
+          <div class="upload-row">
+            <input type="file" accept="image/*" onchange="handleImageUpload(event,'m-img','m-img-preview')">
+            <button class="btn btn-sm btn-danger" type="button" onclick="document.getElementById('m-img').value='';document.getElementById('m-img-preview').style.display='none'">ล้างรูป</button>
+          </div>
+          <div class="hint">เลือกไฟล์จากเครื่อง หรือพิมพ์ลิงก์รูปโดยตรงก็ได้ (แนะนำไฟล์ไม่เกิน 900 KB)</div>
+          <img id="m-img-preview" class="img-preview" src="${v}" style="${v ? 'display:block' : 'display:none'}">
+        </div>`;
+    }
+    if(key === 'content'){
+      return `<div class="form-group"><label>${key.toUpperCase()}</label><textarea id="m-${key}" rows="4">${value || ''}</textarea></div>`;
+    }
+    const safe = (value === undefined || value === null) ? '' : String(value).replace(/"/g,'&quot;');
+    return `<div class="form-group"><label>${key.toUpperCase()}</label><input type="text" id="m-${key}" value="${safe}"></div>`;
   }
 
   function openHeaderEditModal(type) {
@@ -693,18 +735,12 @@
     currentEditIndex = -99;
     const item = db[type];
     document.getElementById('modalTitle').textContent = `⚙️ แก้ไขหัวตาราง (รอบเปลี่ยนแบตเตอรี่)`;
-    
-    let html = '';
     const labels = {
-      h1: "คอลัมน์ 1 (กลุ่มอุปกรณ์)",
-      h2: "คอลัมน์ 2 (จำนวนแบตเตอรี่)",
-      h3: "คอลัมน์ 3 (Vendor รอบ 1)",
-      h4: "คอลัมน์ 4 (เลขอ้างอิง NC 1)",
-      h5: "คอลัมน์ 5 (วันที่ติดตั้ง 1)",
-      h6: "คอลัมน์ 6 (วันที่ครบรอบ 2)",
-      h7: "คอลัมน์ 7 (Vendor รอบ 2)",
-      h8: "คอลัมน์ 8 (เลขอ้างอิง NC 2)"
+      h1:"คอลัมน์ 1 (กลุ่มอุปกรณ์)", h2:"คอลัมน์ 2 (จำนวนแบตเตอรี่)", h3:"คอลัมน์ 3 (Vendor รอบ 1)",
+      h4:"คอลัมน์ 4 (เลขอ้างอิง NC 1)", h5:"คอลัมน์ 5 (วันที่ติดตั้ง 1)", h6:"คอลัมน์ 6 (วันที่ครบรอบ 2)",
+      h7:"คอลัมน์ 7 (Vendor รอบ 2)", h8:"คอลัมน์ 8 (เลขอ้างอิง NC 2)"
     };
+    let html = '';
     for (let key in item) {
       html += `<div class="form-group"><label>${labels[key] || key}</label><input type="text" id="m-${key}" value="${item[key]}"></div>`;
     }
@@ -717,15 +753,8 @@
     currentEditIndex = index;
     const item = db[table][index];
     document.getElementById('modalTitle').textContent = `แก้ไขข้อมูล (${table.toUpperCase()})`;
-    
     let html = '';
-    for (let key in item) {
-      if (key === 'content') {
-        html += `<div class="form-group"><label>${key.toUpperCase()}</label><textarea id="m-${key}" rows="4">${item[key]}</textarea></div>`;
-      } else {
-        html += `<div class="form-group"><label>${key.toUpperCase()}</label><input type="text" id="m-${key}" value="${item[key]}"></div>`;
-      }
-    }
+    for (let key in item) html += buildField(key, item[key]);
     document.getElementById('modalFormFields').innerHTML = html;
     document.getElementById('editModal').style.display = 'flex';
   }
@@ -735,30 +764,18 @@
     currentEditIndex = -1;
     const item = db[table][0] || {};
     document.getElementById('modalTitle').textContent = `เพิ่มข้อมูลใหม่ (${table.toUpperCase()})`;
-    
     let html = '';
-    for (let key in item) {
-      if (key === 'content') {
-        html += `<div class="form-group"><label>${key.toUpperCase()}</label><textarea id="m-${key}" rows="4"></textarea></div>`;
-      } else {
-        html += `<div class="form-group"><label>${key.toUpperCase()}</label><input type="text" id="m-${key}" value=""></div>`;
-      }
-    }
+    for (let key in item) html += buildField(key, '');
     document.getElementById('modalFormFields').innerHTML = html;
     document.getElementById('editModal').style.display = 'flex';
   }
 
-  function closeModal() {
-    document.getElementById('editModal').style.display = 'none';
-  }
+  function closeModal(){ document.getElementById('editModal').style.display = 'none'; }
 
   function saveModalData() {
     if (currentEditIndex === -99) {
       const item = {};
-      const sample = db[currentEditTable];
-      for (let key in sample) {
-        item[key] = document.getElementById(`m-${key}`).value;
-      }
+      for (let key in db[currentEditTable]) item[key] = document.getElementById(`m-${key}`).value;
       db[currentEditTable] = item;
     } else {
       const item = {};
@@ -768,14 +785,9 @@
         if(key === 'kw') val = Number(val) || 0;
         item[key] = val;
       }
-
-      if (currentEditIndex === -1) {
-        db[currentEditTable].push(item);
-      } else {
-        db[currentEditTable][currentEditIndex] = item;
-      }
+      if (currentEditIndex === -1) db[currentEditTable].push(item);
+      else db[currentEditTable][currentEditIndex] = item;
     }
-
     saveData();
     closeModal();
   }
@@ -788,10 +800,8 @@
   }
 
   function switchTab(evt, tabId) {
-    const contents = document.getElementsByClassName('tab-content');
-    for (let c of contents) c.classList.remove('active');
-    const buttons = document.getElementsByClassName('tab-btn');
-    for (let b of buttons) b.classList.remove('active');
+    for (let c of document.getElementsByClassName('tab-content')) c.classList.remove('active');
+    for (let b of document.getElementsByClassName('tab-btn')) b.classList.remove('active');
     document.getElementById(tabId).classList.add('active');
     evt.currentTarget.classList.add('active');
   }
